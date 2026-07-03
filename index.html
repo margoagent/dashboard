@@ -115,6 +115,7 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
     <div class="card">
       <div class="title"><h2>🌿 Трекер привычек</h2><button class="ghost mini" onclick="openAdd('habit')">+ привычка</button></div>
       <div id="habitList"></div>
+      <div id="habitHistory" style="margin-top:8px"></div>
       <div class="support">Раздел «Я» упрощён: теперь здесь только привычки, без отдельной Живы и снижения веса. Всё можно добавить своим пунктом.</div>
     </div>
     <div class="card">
@@ -242,8 +243,10 @@ renderAll();
 var _calEvents=["15:00 Круги советниц", "23:00 Диагностическая сессия — Neurointegration Institute"];
 // localStorage
 function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
-function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects,skills:state.skills,checkedItems:state.checkedItems||{}}))}catch(e){}}
-(function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;if(s.skills)state.skills=s.skills;if(s.checkedItems)state.checkedItems=s.checkedItems;if(!state.lists.intimacy||!state.lists.intimacy.length)state.lists.intimacy=['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание'];}catch(e){}var baked=window._calEvents||[];var ex=new Set(state.lists.todo);var add=baked.filter(function(e){return !ex.has(e);});if(add.length){state.lists.todo=add.concat(state.lists.todo);}renderAll();})();
+function todayStr(){return new Date().toLocaleDateString('ru-RU');}
+function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects,skills:state.skills,checkedItems:state.checkedItems||{},habitHistory:state.habitHistory||{},savedDate:todayStr()}))}catch(e){}}
+function renderHabitHistory(){var h=state.habitHistory||{};var days=Object.keys(h).slice(-7);if(!days.length)return;var total=state.lists.habit.length||1;var html='<div style="font-size:12px;color:#aaa;margin-bottom:4px">История (7 дней)</div><div style="display:flex;gap:6px;flex-wrap:wrap">';days.forEach(function(d){var done=(h[d]||[]).length;var pct=Math.round(done/total*100);var color=pct>=80?'#8fb27d':pct>=50?'#d4e8cc':'#f3f6fb';var txt=pct>=80?'#2b2730':pct>=50?'#2b2730':'#aaa';html+='<div style="background:'+color+';border-radius:8px;padding:4px 8px;font-size:11px;color:'+txt+'">'+d.slice(0,5)+' '+done+'/'+state.lists.habit.length+'</div>';});html+='</div>';var el=document.getElementById('habitHistory');if(el)el.innerHTML=html;}
+(function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;if(s.skills)state.skills=s.skills;if(s.checkedItems)state.checkedItems=s.checkedItems;if(s.habitHistory)state.habitHistory=s.habitHistory;if(!state.lists.intimacy||!state.lists.intimacy.length)state.lists.intimacy=['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание'];var today=todayStr();if(s.savedDate&&s.savedDate!==today&&s.checkedItems&&s.checkedItems.habit&&s.checkedItems.habit.length){if(!state.habitHistory)state.habitHistory={};state.habitHistory[s.savedDate]=s.checkedItems.habit;if(!state.checkedItems)state.checkedItems={};state.checkedItems.habit=[];state.done.habit=0;}}catch(e){}var baked=window._calEvents||[];var ex=new Set(state.lists.todo);var add=baked.filter(function(e){return !ex.has(e);});if(add.length){state.lists.todo=add.concat(state.lists.todo);}renderAll();renderHabitHistory();})();
 document.addEventListener('click',saveState);
 
 // Calendar from GitHub JSON
