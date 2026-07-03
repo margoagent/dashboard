@@ -127,10 +127,10 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
     <div class="card">
       <div class="title"><h2>👨‍👩‍👧‍👦 Семейный баланс</h2><span class="small">заполняется быстро</span></div>
       <div class="family">
-        <div class="person" id="pH"><b>👨 Муж</b><span class="trees">🌳🌳🌱🌱🌱</span><small>время + качество контакта</small></div>
-        <div class="person" id="pD8"><b>👧 Дочь 8</b><span class="trees">🌳🌳🌳🌳🌱</span><small>разговор, прогулка, внимание</small></div>
-        <div class="person" id="pS4"><b>👦 Сын 4</b><span class="trees">🌳🌳🌳🌱🌱</span><small>игра, чтение, контакт</small></div>
-        <div class="person" id="pD2"><b>👶 Дочь 2</b><span class="trees">🌳🌳🌳🌳🌳</span><small>забота и присутствие</small></div>
+        <div class="person" id="pH" onclick="contactModal('pH','👨 Муж')" style="cursor:pointer"><b>👨 Муж</b><span class="trees" id="tH">🌱🌱🌱🌱🌱</span><small id="sH">нажми чтобы отметить</small></div>
+        <div class="person" id="pD8" onclick="contactModal('pD8','👧 Дочь 8')" style="cursor:pointer"><b>👧 Дочь 8</b><span class="trees" id="tD8">🌱🌱🌱🌱🌱</span><small id="sD8">нажми чтобы отметить</small></div>
+        <div class="person" id="pS4" onclick="contactModal('pS4','👦 Сын 4')" style="cursor:pointer"><b>👦 Сын 4</b><span class="trees" id="tS4">🌱🌱🌱🌱🌱</span><small id="sS4">нажми чтобы отметить</small></div>
+        <div class="person" id="pD2" onclick="contactModal('pD2','👶 Дочь 2')" style="cursor:pointer"><b>👶 Дочь 2</b><span class="trees" id="tD2">🌱🌱🌱🌱🌱</span><small id="sD2">нажми чтобы отметить</small></div>
       </div>
       <div class="support" style="margin-top:10px">Заполнение: выбираешь человека → отмечаешь время и качество: «была рядом», «отвлекалась», «живой контакт».</div>
     </div>
@@ -220,9 +220,59 @@ function updateLogic(){let energy=state.done.todo*3+state.done.habit*4;let life=
 function praise(){let m=['Лиса видит: один шаг уже считается.','Мягко и достаточно. Без самокритики.','Ты не бросила себя — это главное.'];document.getElementById('dayInsight').innerText=m[Math.floor(Math.random()*m.length)]}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{let t=b.dataset.tab;document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(t).classList.add('active');document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll(`[data-tab="${t}"]`).forEach(x=>x.classList.add('active'))})
 function openAdd(l){state.activeList=l;document.getElementById('modal').classList.add('show')}function closeModal(){document.getElementById('modal').classList.remove('show')}
-function addItem(){let v=document.getElementById('newItemText').value.trim();if(!v)return;if(state.activeList==='project')state.projects.push({name:v,days:0,energy:45});else state.lists[state.activeList].push(v);document.getElementById('newItemText').value='';closeModal();renderAll();praise()}
+function addItem(){let v=document.getElementById('newItemText').value.trim();if(!v)return;if(state.activeList==='project')state.projects.push({name:v,days:0,energy:45});else state.lists[state.activeList].push(v);document.getElementById('newItemText').value='';closeModal();renderAll();
+
+let _contactId='',_contactName='';
+const _contactLevels={'живой контакт':5,'была рядом':3,'отвлекалась':1};
+const _state2=(localStorage.getItem('lisaFamily')?JSON.parse(localStorage.getItem('lisaFamily')):{});
+function contactModal(id,name){_contactId=id;_contactName=name;document.getElementById('contactTitle').innerText=name;document.getElementById('contactModal').style.display='flex';}
+function logContact(type,icon){
+  _state2[_contactId]=(_state2[_contactId]||0)+_contactLevels[type];
+  localStorage.setItem('lisaFamily',JSON.stringify(_state2));
+  document.getElementById('contactModal').style.display='none';
+  updateTrees();
+  document.getElementById('dayInsight').innerText=_contactName+': '+type+' ✓';
+}
+function updateTrees(){
+  const map={pH:'tH',pD8:'tD8',pS4:'tS4',pD2:'tD2'};
+  const smap={pH:'sH',pD8:'sD8',pS4:'sS4',pD2:'sD2'};
+  Object.keys(map).forEach(id=>{
+    const v=Math.min(_state2[id]||0,10);
+    const trees=Math.round(v/2);
+    document.getElementById(map[id]).innerText='🌳'.repeat(trees)+'🌱'.repeat(5-trees);
+    const types=['нажми чтобы отметить','отвлекалась','была рядом','живой контакт','отлично','идеально'];
+    document.getElementById(smap[id]).innerText=types[Math.min(trees,5)];
+  });
+}
+updateTrees();
+praise()}
 function beforeNewProject(){openAdd('project')}
-function stepProject(i){state.projects[i].days=0;state.projects[i].energy=Math.max(10,state.projects[i].energy-14);renderAll();praise()}
+function stepProject(i){state.projects[i].days=0;state.projects[i].energy=Math.max(10,state.projects[i].energy-14);renderAll();
+
+let _contactId='',_contactName='';
+const _contactLevels={'живой контакт':5,'была рядом':3,'отвлекалась':1};
+const _state2=(localStorage.getItem('lisaFamily')?JSON.parse(localStorage.getItem('lisaFamily')):{});
+function contactModal(id,name){_contactId=id;_contactName=name;document.getElementById('contactTitle').innerText=name;document.getElementById('contactModal').style.display='flex';}
+function logContact(type,icon){
+  _state2[_contactId]=(_state2[_contactId]||0)+_contactLevels[type];
+  localStorage.setItem('lisaFamily',JSON.stringify(_state2));
+  document.getElementById('contactModal').style.display='none';
+  updateTrees();
+  document.getElementById('dayInsight').innerText=_contactName+': '+type+' ✓';
+}
+function updateTrees(){
+  const map={pH:'tH',pD8:'tD8',pS4:'tS4',pD2:'tD2'};
+  const smap={pH:'sH',pD8:'sD8',pS4:'sS4',pD2:'sD2'};
+  Object.keys(map).forEach(id=>{
+    const v=Math.min(_state2[id]||0,10);
+    const trees=Math.round(v/2);
+    document.getElementById(map[id]).innerText='🌳'.repeat(trees)+'🌱'.repeat(5-trees);
+    const types=['нажми чтобы отметить','отвлекалась','была рядом','живой контакт','отлично','идеально'];
+    document.getElementById(smap[id]).innerText=types[Math.min(trees,5)];
+  });
+}
+updateTrees();
+praise()}
 function releaseProject(i){let el=document.getElementById('proj'+i);el.innerHTML='<div class="support">✨ Спасибо. Ты выбрала отпустить. Это завершение, а не провал. Хвост превращается в птицу 🕊</div>';setTimeout(()=>{state.projects.splice(i,1);renderAll()},1100)}
 function addCheckin(){let time=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});document.getElementById('checkins').insertAdjacentHTML('afterbegin',`<div class="note"><b>${time}</b><p class="small">Что слышу? Что чувствую? Чего хочу? Где моё тело?</p></div>`)}
 function autoFillDay(){document.getElementById('dayInsight').innerText='Лиса собрала день: 2 дела из календаря, 3 привычки, 1 хвост и один семейный контакт. Остальное можно не трогать.'}
@@ -234,6 +284,31 @@ function newIdea(){document.getElementById('incomeIdea').innerText=state.ideas[M
 function openSkill(){document.getElementById('skillModal').classList.add('show')}function closeSkill(){document.getElementById('skillModal').classList.remove('show')}
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();praise()}
 renderAll();
+
+let _contactId='',_contactName='';
+const _contactLevels={'живой контакт':5,'была рядом':3,'отвлекалась':1};
+const _state2=(localStorage.getItem('lisaFamily')?JSON.parse(localStorage.getItem('lisaFamily')):{});
+function contactModal(id,name){_contactId=id;_contactName=name;document.getElementById('contactTitle').innerText=name;document.getElementById('contactModal').style.display='flex';}
+function logContact(type,icon){
+  _state2[_contactId]=(_state2[_contactId]||0)+_contactLevels[type];
+  localStorage.setItem('lisaFamily',JSON.stringify(_state2));
+  document.getElementById('contactModal').style.display='none';
+  updateTrees();
+  document.getElementById('dayInsight').innerText=_contactName+': '+type+' ✓';
+}
+function updateTrees(){
+  const map={pH:'tH',pD8:'tD8',pS4:'tS4',pD2:'tD2'};
+  const smap={pH:'sH',pD8:'sD8',pS4:'sS4',pD2:'sD2'};
+  Object.keys(map).forEach(id=>{
+    const v=Math.min(_state2[id]||0,10);
+    const trees=Math.round(v/2);
+    document.getElementById(map[id]).innerText='🌳'.repeat(trees)+'🌱'.repeat(5-trees);
+    const types=['нажми чтобы отметить','отвлекалась','была рядом','живой контакт','отлично','идеально'];
+    document.getElementById(smap[id]).innerText=types[Math.min(trees,5)];
+  });
+}
+updateTrees();
+
 
 // localStorage persistence
 function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects,skills:state.skills,ideas:state.ideas}))}catch(e){}}
@@ -287,5 +362,15 @@ async function loadCalendar(){
 }
 
 </script>
+
+<div id="contactModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:flex-end;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+<div style="width:100%;max-width:430px;background:#fff;border-radius:30px 30px 0 0;padding:20px 16px 32px">
+  <b id="contactTitle" style="font-size:18px"></b>
+  <div style="display:grid;gap:10px;margin-top:16px">
+    <button onclick="logContact('живой контакт','🌳')" style="background:#8fb27d;border-radius:16px;padding:14px;font-size:15px">🌳 Живой контакт</button>
+    <button onclick="logContact('была рядом','🌿')" style="background:#d4e8cc;color:#2b2730;border-radius:16px;padding:14px;font-size:15px">🌿 Была рядом</button>
+    <button onclick="logContact('отвлекалась','🌱')" style="background:#f3f6fb;color:#2b2730;border-radius:16px;padding:14px;font-size:15px">🌱 Отвлекалась</button>
+  </div>
+</div></div>
 </body>
 </html>
