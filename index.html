@@ -75,6 +75,7 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
         <div class="metric"><b id="energyTxt">0%</b><span>энергия</span><div class="bar"><i id="energyBar" style="width:0%"></i></div></div>
         <div class="metric"><b id="lifeTxt">0%</b><span>своя жизнь</span><div class="bar"><i id="lifeBar" style="width:0%"></i></div></div>
       </div>
+      <div style="text-align:right;margin-top:6px"><span onclick="openPct()" style="font-size:12px;color:#aaa;cursor:pointer;text-decoration:underline">✏️ выставить вручную</span></div>
     </div>
 
     <div class="card">
@@ -229,10 +230,14 @@ function renderSkills(){document.getElementById('skillList').innerHTML=state.ski
 function deleteSkill(i){state.skills.splice(i,1);renderSkills();saveState();}
 function toggleBox(el,k,i){el.classList.toggle('done');var done=el.classList.contains('done');state.done[k]+=done?1:-1;if(!state.checkedItems)state.checkedItems={todo:[],habit:[],relation:[],intimacy:[]};if(!state.checkedItems[k])state.checkedItems[k]=[];var t=state.lists[k][i];if(done){if(!state.checkedItems[k].includes(t))state.checkedItems[k].push(t);}else{state.checkedItems[k]=state.checkedItems[k].filter(function(x){return x!==t;});}praise();updateLogic();saveState();renderHabitHistory();}
 function setRoom(id,glow,text){var el=document.getElementById(id);if(!el)return;el.className='room'+(glow?' glow':'');el.querySelector('span').innerText=text||'—';}
+function openPct(){var me=localStorage.getItem('pctE');var ml=localStorage.getItem('pctL');var ev=me!==null?+me:Math.min(state.done.todo*3+state.done.habit*4,100);var lv=ml!==null?+ml:Math.min(state.done.relation*6+state.done.todo*3+state.done.habit*2,100);document.getElementById('pEnergy').value=ev;document.getElementById('pEVal').innerText=ev;document.getElementById('pLife').value=lv;document.getElementById('pLVal').innerText=lv;document.getElementById('pctModal').style.display='flex';}
+function savePct(){localStorage.setItem('pctE',document.getElementById('pEnergy').value);localStorage.setItem('pctL',document.getElementById('pLife').value);document.getElementById('pctModal').style.display='none';updateLogic();}
+function clearPct(){localStorage.removeItem('pctE');localStorage.removeItem('pctL');document.getElementById('pctModal').style.display='none';updateLogic();}
 function updateLogic(){
-  let energy=state.done.todo*3+state.done.habit*4;let life=state.done.relation*6+state.done.todo*3+state.done.habit*2;
-  document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=energy+'%';
-  document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=life+'%';
+  var eManual=localStorage.getItem('pctE');var lManual=localStorage.getItem('pctL');
+  let energy=eManual!==null?+eManual:state.done.todo*3+state.done.habit*4;let life=lManual!==null?+lManual:state.done.relation*6+state.done.todo*3+state.done.habit*2;
+  document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=Math.min(energy,100)+'%';
+  document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=Math.min(life,100)+'%';
   // Я — привычки
   var hDone=state.checkedItems&&state.checkedItems.habit?state.checkedItems.habit.length:0;
   var hTotal=state.lists.habit.length||1;
@@ -269,7 +274,7 @@ function openAI(){document.querySelector('[data-tab="home"]').click();autoFillDa
 function addDay(){document.getElementById('dayModal').style.display='flex';['dayWin','dayMood','dayMemory','dayMusic'].forEach(function(id){document.getElementById(id).value='';});}
 function saveDay(){var win=document.getElementById('dayWin').value.trim();var mood=document.getElementById('dayMood').value.trim();var mem=document.getElementById('dayMemory').value.trim();var music=document.getElementById('dayMusic').value.trim();if(!win&&!mood&&!mem)return;var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');var emojis=['🌿','☀️','🌙','✨','🌸'];var emoji=emojis[Math.floor(Math.random()*emojis.length)];days.unshift({date:new Date().toLocaleDateString('ru'),win:win,mood:mood,mem:mem,music:music,emoji:emoji});localStorage.setItem('lisaDays',JSON.stringify(days));renderDays();document.getElementById('dayModal').style.display='none';}
 function deleteDayCard(i){var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');days.splice(i,1);localStorage.setItem('lisaDays',JSON.stringify(days));renderDays();}
-function renderDays(){var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');var el=document.getElementById('days');if(!el)return;if(!days.length){el.innerHTML='<div class="support">Нажми «+ день» чтобы записать сегодняшний день.</div>';return;}el.innerHTML=days.map(function(d,i){return '<div class="note"><div style="display:flex;justify-content:space-between;align-items:center"><b>'+d.emoji+' '+d.date+'</b><span onclick="deleteDayCard('+i+')" style="color:#ccc;font-size:18px;cursor:pointer">×</span></div><p class="small" style="margin:6px 0 0">'+(d.win?'🏆 '+d.win+'<br>':'')+(d.mood?'💭 '+d.mood+'<br>':'')+(d.mem?'⏳ '+d.mem+'<br>':'')+(d.music?'🎵 '+d.music:'')+'</p></div>';}).join('');}
+function renderDays(){var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');var el=document.getElementById('days');if(!el)return;if(!days.length){el.innerHTML='<div class="support" onclick="addDay()" style="cursor:pointer;text-align:center">📝 Нажми чтобы записать сегодняшний день</div>';return;}el.innerHTML=days.map(function(d,i){return '<div class="note"><div style="display:flex;justify-content:space-between;align-items:center"><b>'+d.emoji+' '+d.date+'</b><span onclick="deleteDayCard('+i+')" style="color:#ccc;font-size:18px;cursor:pointer">×</span></div><p class="small" style="margin:6px 0 0">'+(d.win?'🏆 '+d.win+'<br>':'')+(d.mood?'💭 '+d.mood+'<br>':'')+(d.mem?'⏳ '+d.mem+'<br>':'')+(d.music?'🎵 '+d.music:'')+'</p></div>';}).join('');}
 renderDays();
 function saveThanks(){var t=document.getElementById('thanksText').value.trim();if(!t)return;var arr=JSON.parse(localStorage.getItem('lisaThanks')||'[]');arr.unshift({date:new Date().toLocaleDateString('ru'),text:t});if(arr.length>30)arr=arr.slice(0,30);localStorage.setItem('lisaThanks',JSON.stringify(arr));document.getElementById('thanksText').value='';renderThanks();}
 function renderThanks(){var arr=JSON.parse(localStorage.getItem('lisaThanks')||'[]');var el=document.getElementById('thanksList');if(!el)return;el.innerHTML=arr.slice(0,5).map(function(x){return '<div class="note" style="padding:8px 10px;margin-bottom:6px"><span style="font-size:11px;color:#aaa">'+x.date+'</span><p class="small" style="margin:2px 0 0">'+x.text.replace(/\n/g,'<br>')+'</p></div>';}).join('');}
@@ -316,7 +321,7 @@ function renderHabitHistory(){
   html+='</div>';
   el.innerHTML=html;
 }
-(function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;if(s.skills)state.skills=s.skills;if(s.checkedItems)state.checkedItems=s.checkedItems;if(s.habitHistory)state.habitHistory=s.habitHistory;if(!state.lists.intimacy||!state.lists.intimacy.length)state.lists.intimacy=['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание'];var today=todayStr();if(s.savedDate&&s.savedDate!==today&&s.checkedItems&&s.checkedItems.habit&&s.checkedItems.habit.length){if(!state.habitHistory)state.habitHistory={};state.habitHistory[s.savedDate]=s.checkedItems.habit;if(!state.checkedItems)state.checkedItems={};state.checkedItems.habit=[];state.done.habit=0;}}catch(e){}var baked=window._calEvents||[];var ex=new Set(state.lists.todo);var add=baked.filter(function(e){return !ex.has(e);});if(add.length){state.lists.todo=add.concat(state.lists.todo);}renderAll();renderHabitHistory();})();
+(function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;if(s.skills)state.skills=s.skills;if(s.checkedItems)state.checkedItems=s.checkedItems;if(s.habitHistory)state.habitHistory=s.habitHistory;if(s.checkedItems){Object.keys(state.done).forEach(function(k){state.done[k]=(s.checkedItems[k]||[]).length;});}if(!state.lists.intimacy||!state.lists.intimacy.length)state.lists.intimacy=['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание'];var today=todayStr();if(s.savedDate&&s.savedDate!==today&&s.checkedItems&&s.checkedItems.habit&&s.checkedItems.habit.length){if(!state.habitHistory)state.habitHistory={};state.habitHistory[s.savedDate]=s.checkedItems.habit;if(!state.checkedItems)state.checkedItems={};state.checkedItems.habit=[];state.done.habit=0;}}catch(e){}var baked=window._calEvents||[];var ex=new Set(state.lists.todo);var add=baked.filter(function(e){return !ex.has(e);});if(add.length){state.lists.todo=add.concat(state.lists.todo);}renderAll();renderHabitHistory();})();
 document.addEventListener('click',saveState);
 
 // Calendar from GitHub JSON
@@ -368,6 +373,21 @@ updateTrees();
     <input id="dayMusic" placeholder="🎵 Музыка дня (необязательно)" style="border:1.5px solid #e8edf3;border-radius:12px;padding:12px;font-size:15px;width:100%;box-sizing:border-box">
     <button onclick="saveDay()" style="background:#8fb27d;border-radius:16px;padding:14px;font-size:15px;border:0;color:white;font-weight:700;margin-top:4px">Сохранить день</button>
   </div>
+</div></div>
+
+<div id="pctModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:flex-end;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+<div style="width:100%;max-width:430px;background:#fff;border-radius:30px 30px 0 0;padding:20px 16px 32px">
+  <b style="font-size:18px;display:block;margin-bottom:16px">✏️ Как ощущается день?</b>
+  <div style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:#6e6670;margin-bottom:6px"><span>⚡ Энергия</span><b id="pEVal" style="color:#ff7a1a">50%</b></div>
+    <input type="range" id="pEnergy" min="0" max="100" value="50" style="width:100%" oninput="document.getElementById('pEVal').innerText=this.value+'%'">
+  </div>
+  <div style="margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;font-size:13px;color:#6e6670;margin-bottom:6px"><span>🌿 Своя жизнь</span><b id="pLVal" style="color:#8fb27d">50%</b></div>
+    <input type="range" id="pLife" min="0" max="100" value="50" style="width:100%" oninput="document.getElementById('pLVal').innerText=this.value+'%'">
+  </div>
+  <button style="width:100%;background:#8fb27d;border-radius:16px;padding:14px;font-size:15px;border:0;color:white;font-weight:700" onclick="savePct()">Сохранить</button>
+  <button style="width:100%;margin-top:8px;background:#f3f6fb;color:#6e6670;border-radius:16px;padding:12px;font-size:14px;border:0" onclick="clearPct()">Считать по галочкам</button>
 </div></div>
 
 <div id="incomeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:flex-end;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
