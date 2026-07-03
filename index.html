@@ -204,7 +204,7 @@ const state={
   todo:[],
   habit:[],
   relation:[],
-  intimacy:[]
+  intimacy:['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание']
  },
  projects:[],
  skills:[],
@@ -243,7 +243,7 @@ var _calEvents=["15:00 Круги советниц", "23:00 Диагностич
 // localStorage
 function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
 function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects,skills:state.skills,checkedItems:state.checkedItems||{}}))}catch(e){}}
-(function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;if(s.skills)state.skills=s.skills;if(s.checkedItems)state.checkedItems=s.checkedItems;}catch(e){}var baked=window._calEvents||[];var ex=new Set(state.lists.todo);var add=baked.filter(function(e){return !ex.has(e);});if(add.length){state.lists.todo=add.concat(state.lists.todo);}renderAll();})();
+(function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;if(s.skills)state.skills=s.skills;if(s.checkedItems)state.checkedItems=s.checkedItems;if(!state.lists.intimacy||!state.lists.intimacy.length)state.lists.intimacy=['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание'];}catch(e){}var baked=window._calEvents||[];var ex=new Set(state.lists.todo);var add=baked.filter(function(e){return !ex.has(e);});if(add.length){state.lists.todo=add.concat(state.lists.todo);}renderAll();})();
 document.addEventListener('click',saveState);
 
 // Calendar from GitHub JSON
