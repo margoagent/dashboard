@@ -230,7 +230,7 @@ function openAI(){document.querySelector('[data-tab="home"]').click();autoFillDa
 function addDay(){document.getElementById('days').insertAdjacentHTML('afterbegin','<div class="note"><b>Сегодня 🌿</b><p class="small">Победа: __. Эмоция: __. Что запомню через 10 лет: __.</p><span class="tag">фото дня</span><span class="tag">музыка дня</span></div>')}
 function saveThanks(){}
 function addIncome(){document.getElementById('income').insertAdjacentHTML('afterbegin','<div class="note"><b>Новый приход</b><p class="small">Источник, сумма, какой навык помог?</p></div>')}
-function newIdea(){document.getElementById('incomeIdea').innerText=state.ideas[Math.floor(Math.random()*state.ideas.length)]}
+function newIdea(){var ideas=state.ideas.length?state.ideas:['Мастер-класс по настольным играм онлайн','Шаблоны карт для печати — PDF-продукт','Консультация по игровому дизайну','Подписка: «Игра месяца» для семей','Готовый комплект для корпоративных игр'];document.getElementById('incomeIdea').innerText=ideas[Math.floor(Math.random()*ideas.length)];}
 function openSkill(){document.getElementById('skillModal').classList.add('show')}function closeSkill(){document.getElementById('skillModal').classList.remove('show')}
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();praise()}
 renderAll();
