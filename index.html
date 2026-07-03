@@ -234,7 +234,11 @@ function releaseProject(i){let el=document.getElementById('proj'+i);el.innerHTML
 function addCheckin(){let time=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});document.getElementById('checkins').insertAdjacentHTML('afterbegin',`<div class="note"><b>${time}</b><p class="small">Что слышу? Что чувствую? Чего хочу? Где моё тело?</p></div>`)}
 function autoFillDay(){document.getElementById('dayInsight').innerText='Лиса собрала день: 2 дела из календаря, 3 привычки, 1 хвост и один семейный контакт. Остальное можно не трогать.'}
 function openAI(){document.querySelector('[data-tab="home"]').click();autoFillDay()}
-function addDay(){document.getElementById('days').insertAdjacentHTML('afterbegin','<div class="note"><b>Сегодня 🌿</b><p class="small">Победа: __. Эмоция: __. Что запомню через 10 лет: __.</p><span class="tag">фото дня</span><span class="tag">музыка дня</span></div>')}
+function addDay(){document.getElementById('dayModal').style.display='flex';['dayWin','dayMood','dayMemory','dayMusic'].forEach(function(id){document.getElementById(id).value='';});}
+function saveDay(){var win=document.getElementById('dayWin').value.trim();var mood=document.getElementById('dayMood').value.trim();var mem=document.getElementById('dayMemory').value.trim();var music=document.getElementById('dayMusic').value.trim();if(!win&&!mood&&!mem)return;var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');var emojis=['🌿','☀️','🌙','✨','🌸'];var emoji=emojis[Math.floor(Math.random()*emojis.length)];days.unshift({date:new Date().toLocaleDateString('ru'),win:win,mood:mood,mem:mem,music:music,emoji:emoji});localStorage.setItem('lisaDays',JSON.stringify(days));renderDays();document.getElementById('dayModal').style.display='none';}
+function deleteDayCard(i){var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');days.splice(i,1);localStorage.setItem('lisaDays',JSON.stringify(days));renderDays();}
+function renderDays(){var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');var el=document.getElementById('days');if(!el)return;if(!days.length){el.innerHTML='<div class="support">Нажми «+ день» чтобы записать сегодняшний день.</div>';return;}el.innerHTML=days.map(function(d,i){return '<div class="note"><div style="display:flex;justify-content:space-between;align-items:center"><b>'+d.emoji+' '+d.date+'</b><span onclick="deleteDayCard('+i+')" style="color:#ccc;font-size:18px;cursor:pointer">×</span></div><p class="small" style="margin:6px 0 0">'+(d.win?'🏆 '+d.win+'<br>':'')+(d.mood?'💭 '+d.mood+'<br>':'')+(d.mem?'⏳ '+d.mem+'<br>':'')+(d.music?'🎵 '+d.music:'')+'</p></div>';}).join('');}
+renderDays();
 function saveThanks(){}
 function addIncome(){document.getElementById('incomeModal').style.display='flex';document.getElementById('incSource').value='';document.getElementById('incAmount').value='';document.getElementById('incSkill').value='';}
 function saveIncome(){var src=document.getElementById('incSource').value.trim();var amt=+document.getElementById('incAmount').value||0;var sk=document.getElementById('incSkill').value.trim();if(!src)return;var inc=JSON.parse(localStorage.getItem('lisaIncome')||'[]');inc.unshift({src:src,amt:amt,sk:sk,date:new Date().toLocaleDateString('ru')});localStorage.setItem('lisaIncome',JSON.stringify(inc));renderIncome();document.getElementById('incomeModal').style.display='none';}
@@ -317,6 +321,18 @@ updateTrees();
     <button onclick="logContact('живой контакт')" style="background:#8fb27d;border-radius:16px;padding:14px;font-size:15px;border:0;color:white;font-weight:700">🌳 Живой контакт</button>
     <button onclick="logContact('была рядом')" style="background:#d4e8cc;color:#2b2730;border-radius:16px;padding:14px;font-size:15px;border:0;font-weight:700">🌿 Была рядом</button>
     <button onclick="logContact('отвлекалась')" style="background:#f3f6fb;color:#6e6670;border-radius:16px;padding:14px;font-size:15px;border:0;font-weight:700">🌱 Отвлекалась</button>
+  </div>
+</div></div>
+
+<div id="dayModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:flex-end;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+<div style="width:100%;max-width:430px;background:#fff;border-radius:30px 30px 0 0;padding:20px 16px 32px">
+  <b style="font-size:18px;display:block;margin-bottom:16px">📚 Прожитый день</b>
+  <div style="display:grid;gap:10px">
+    <input id="dayWin" placeholder="🏆 Победа дня" style="border:1.5px solid #e8edf3;border-radius:12px;padding:12px;font-size:15px;width:100%;box-sizing:border-box">
+    <input id="dayMood" placeholder="💭 Эмоция дня" style="border:1.5px solid #e8edf3;border-radius:12px;padding:12px;font-size:15px;width:100%;box-sizing:border-box">
+    <input id="dayMemory" placeholder="⏳ Что запомню через 10 лет" style="border:1.5px solid #e8edf3;border-radius:12px;padding:12px;font-size:15px;width:100%;box-sizing:border-box">
+    <input id="dayMusic" placeholder="🎵 Музыка дня (необязательно)" style="border:1.5px solid #e8edf3;border-radius:12px;padding:12px;font-size:15px;width:100%;box-sizing:border-box">
+    <button onclick="saveDay()" style="background:#8fb27d;border-radius:16px;padding:14px;font-size:15px;border:0;color:white;font-weight:700;margin-top:4px">Сохранить день</button>
   </div>
 </div></div>
 
