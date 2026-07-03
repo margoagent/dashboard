@@ -202,13 +202,13 @@ const state={
  activeList:'todo', done:{todo:0,habit:0,relation:0,intimacy:0},
  lists:{
   todo:[],
-  habit:['💊 Таблетки','📖 Чтение','🙏 Благодарность','🌙 Сон до 23:00','🥗 Мягкое питание'],
-  relation:['💬 Разговор без телефона','🫂 Объятия','☕ Время вдвоём','📖 Чтение ребёнку','🤝 Совместное дело'],
-  intimacy:['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание']
+  habit:[],
+  relation:[],
+  intimacy:[]
  },
  projects:[],
- skills:[['Игропрактика',92,64,38],['ИИ / вайбкодинг',86,52,18],['Дизайн продуктов',78,71,26],['Жива',67,20,0]],
- ideas:['Подписка: «365 вопросов для женских кругов».','AI-конструктор раскрасок для экспертов.','Мини-продукт: «7 дней Живы для занятых мам».','Диагностика навыков эксперта.']
+ skills:[],
+ ideas:[]
 };
 function renderList(k){let el=document.getElementById(k+'List');if(!el)return;el.innerHTML=state.lists[k].map(t=>`<div class="check"><span class="box" onclick="toggleBox(this,'${k}')"></span><span>${t}</span></div>`).join('')}
 function renderAll(){Object.keys(state.lists).forEach(renderList);renderProjects();renderSkills();updateLogic()}
@@ -216,7 +216,7 @@ function renderProjects(){document.getElementById('projectList').innerHTML=state
 function line(t,v,g){return `<div class="skillLine"><span>${t}</span><div class="bar"><i style="width:${v}%;background:${g?'linear-gradient(90deg,var(--gold),#f6db8f)':''}"></i></div><span>${v}%</span></div>`}
 function renderSkills(){document.getElementById('skillList').innerHTML=state.skills.map(s=>`<div class="project"><b>${s[0]}</b>${line('изучила',s[1])}${line('применила',s[2])}${line('заработала',s[3],s[3]>35)}</div>`).join('')}
 function toggleBox(el,k){el.classList.toggle('done');state.done[k]+=el.classList.contains('done')?1:-1;praise();updateLogic()}
-function updateLogic(){let energy=55+state.done.todo*3+state.done.habit*4-state.projects.length*2;let life=45+state.done.relation*6+state.done.todo*3+state.done.habit*2;energy=Math.max(25,Math.min(95,energy));life=Math.max(20,Math.min(96,life));document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=energy+'%';document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=life+'%';if(state.done.relation>1){document.getElementById('roomHusband').className='room glow';document.getElementById('roomHusband').querySelector('span').innerText='потеплело';}}
+function updateLogic(){let energy=state.done.todo*3+state.done.habit*4;let life=state.done.relation*6+state.done.todo*3+state.done.habit*2;energy=Math.max(25,Math.min(95,energy));life=Math.max(20,Math.min(96,life));document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=energy+'%';document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=life+'%';if(state.done.relation>1){document.getElementById('roomHusband').className='room glow';document.getElementById('roomHusband').querySelector('span').innerText='потеплело';}}
 function praise(){let m=['Лиса видит: один шаг уже считается.','Мягко и достаточно. Без самокритики.','Ты не бросила себя — это главное.'];document.getElementById('dayInsight').innerText=m[Math.floor(Math.random()*m.length)]}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{let t=b.dataset.tab;document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(t).classList.add('active');document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll(`[data-tab="${t}"]`).forEach(x=>x.classList.add('active'))})
 function openAdd(l){state.activeList=l;document.getElementById('modal').classList.add('show')}function closeModal(){document.getElementById('modal').classList.remove('show')}
