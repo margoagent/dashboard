@@ -223,7 +223,34 @@ function line(t,v,g){return `<div class="skillLine"><span>${t}</span><div class=
 function renderSkills(){document.getElementById('skillList').innerHTML=state.skills.map((s,i)=>`<div class="project"><div style="display:flex;justify-content:space-between;align-items:center"><b>${s[0]}</b><span onclick="deleteSkill(${i})" style="color:#ccc;font-size:20px;cursor:pointer;padding:0 4px">×</span></div>${line('изучила',s[1])}${line('применила',s[2])}<div class="skillLine"><span>заработала</span><div class="bar"><i style="width:${Math.min(s[3]/10000*100,100)}%;background:linear-gradient(90deg,var(--gold),#f6db8f)"></i></div><span>${s[3].toLocaleString('ru')} ₽</span></div></div>`).join('')}
 function deleteSkill(i){state.skills.splice(i,1);renderSkills();saveState();}
 function toggleBox(el,k,i){el.classList.toggle('done');var done=el.classList.contains('done');state.done[k]+=done?1:-1;if(!state.checkedItems)state.checkedItems={todo:[],habit:[],relation:[],intimacy:[]};if(!state.checkedItems[k])state.checkedItems[k]=[];var t=state.lists[k][i];if(done){if(!state.checkedItems[k].includes(t))state.checkedItems[k].push(t);}else{state.checkedItems[k]=state.checkedItems[k].filter(function(x){return x!==t;});}praise();updateLogic();saveState();renderHabitHistory();}
-function updateLogic(){let energy=state.done.todo*3+state.done.habit*4;let life=state.done.relation*6+state.done.todo*3+state.done.habit*2;document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=energy+'%';document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=life+'%';if(state.done.relation>1){document.getElementById('roomHusband').className='room glow';document.getElementById('roomHusband').querySelector('span').innerText='потеплело';}}
+function setRoom(id,glow,text){var el=document.getElementById(id);if(!el)return;el.className='room'+(glow?' glow':'');el.querySelector('span').innerText=text||'—';}
+function updateLogic(){
+  let energy=state.done.todo*3+state.done.habit*4;let life=state.done.relation*6+state.done.todo*3+state.done.habit*2;
+  document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=energy+'%';
+  document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=life+'%';
+  // Я — привычки
+  var hDone=state.checkedItems&&state.checkedItems.habit?state.checkedItems.habit.length:0;
+  var hTotal=state.lists.habit.length||1;
+  setRoom('roomSelf',hDone>0,hDone?hDone+'/'+hTotal+' привычек':'нет данных');
+  // Семья — контакты из _fam
+  var fam=JSON.parse(localStorage.getItem('lisaFamily')||'{}');
+  setRoom('roomHusband',(fam['pH']||0)>0,(fam['pH']||0)>0?'контакт был':'нет контакта');
+  setRoom('roomD8',(fam['pD8']||0)>0,(fam['pD8']||0)>0?'контакт был':'нет контакта');
+  setRoom('roomS4',(fam['pS4']||0)>0,(fam['pS4']||0)>0?'контакт был':'нет контакта');
+  setRoom('roomD2',(fam['pD2']||0)>0,(fam['pD2']||0)>0?'контакт был':'нет контакта');
+  // Проекты
+  setRoom('roomWork',state.projects.length>0,state.projects.length?state.projects.length+' проектов':'нет проектов');
+  // Деньги
+  var inc=JSON.parse(localStorage.getItem('lisaIncome')||'[]');
+  setRoom('roomMoney',inc.length>0,inc.length?inc.length+' приходов':'нет записей');
+  // Дни
+  var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');
+  setRoom('roomMeaning',days.length>0,days.length?days.length+' дней':'нет записей');
+  // Отдых — чекины
+  var cEl=document.getElementById('checkins');
+  var checkins=cEl?cEl.children.length:0;
+  setRoom('roomRest',checkins>0,checkins?checkins+' чекинов':'нет чекинов');
+}
 function praise(){let m=['Лиса видит: один шаг уже считается.','Мягко и достаточно. Без самокритики.','Ты не бросила себя — это главное.'];document.getElementById('dayInsight').innerText=m[Math.floor(Math.random()*m.length)]}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{let t=b.dataset.tab;document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(t).classList.add('active');document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll(`[data-tab="${t}"]`).forEach(x=>x.classList.add('active'))})
 function openAdd(l){state.activeList=l;var wr=document.getElementById('projectWeightRow');if(wr)wr.style.display=l==='project'?'block':'none';document.getElementById('modal').classList.add('show')}function closeModal(){document.getElementById('modal').classList.remove('show')}
