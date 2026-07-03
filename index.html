@@ -216,7 +216,7 @@ function renderProjects(){document.getElementById('projectList').innerHTML=state
 function line(t,v,g){return `<div class="skillLine"><span>${t}</span><div class="bar"><i style="width:${v}%;background:${g?'linear-gradient(90deg,var(--gold),#f6db8f)':''}"></i></div><span>${v}%</span></div>`}
 function renderSkills(){document.getElementById('skillList').innerHTML=state.skills.map(s=>`<div class="project"><b>${s[0]}</b>${line('изучила',s[1])}${line('применила',s[2])}${line('заработала',s[3],s[3]>35)}</div>`).join('')}
 function toggleBox(el,k){el.classList.toggle('done');state.done[k]+=el.classList.contains('done')?1:-1;praise();updateLogic()}
-function updateLogic(){let energy=state.done.todo*3+state.done.habit*4;let life=state.done.relation*6+state.done.todo*3+state.done.habit*2;energy=Math.max(25,Math.min(95,energy));life=Math.max(20,Math.min(96,life));document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=energy+'%';document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=life+'%';if(state.done.relation>1){document.getElementById('roomHusband').className='room glow';document.getElementById('roomHusband').querySelector('span').innerText='потеплело';}}
+function updateLogic(){let energy=state.done.todo*3+state.done.habit*4;let life=state.done.relation*6+state.done.todo*3+state.done.habit*2;document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=energy+'%';document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=life+'%';if(state.done.relation>1){document.getElementById('roomHusband').className='room glow';document.getElementById('roomHusband').querySelector('span').innerText='потеплело';}}
 function praise(){let m=['Лиса видит: один шаг уже считается.','Мягко и достаточно. Без самокритики.','Ты не бросила себя — это главное.'];document.getElementById('dayInsight').innerText=m[Math.floor(Math.random()*m.length)]}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{let t=b.dataset.tab;document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(t).classList.add('active');document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll(`[data-tab="${t}"]`).forEach(x=>x.classList.add('active'))})
 function openAdd(l){state.activeList=l;document.getElementById('modal').classList.add('show')}function closeModal(){document.getElementById('modal').classList.remove('show')}
@@ -243,30 +243,35 @@ document.addEventListener('click',saveState);
 // Google Calendar ICS → todo list
 async function loadCalendar(){
   const ICS='https://calendar.google.com/calendar/ical/hmurova%40gmail.com/private-830ed895fd959d8f9458c6a2fe4effe8/basic.ics';
-  try{
-    const r=await fetch('https://corsproxy.io/?'+encodeURIComponent(ICS));
-    const txt=await r.text();
-    const today=new Date().toISOString().slice(0,10).replace(/-/g,'');
-    const evs=[];
-    (txt.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/g)||[]).forEach(e=>{
-      const dt=(e.match(/DTSTART[^:]*:(\d{8})/)||[])[1];
-      const sum=(e.match(/SUMMARY:(.+)/)||[])[1];
-      const tm=(e.match(/DTSTART[^:]*:T?(\d{6})/)||[])[1];
-      if(dt===today&&sum){
-        let label=sum.trim();
-        if(tm){const h=tm.slice(0,2),m=tm.slice(2,4);label=h+':'+m+' '+label;}
-        evs.push(label);
-      }
-    });
-    if(evs.length){
-      const existing=new Set(state.lists.todo);
-      evs.filter(e=>!existing.has(e)).forEach(e=>state.lists.todo.unshift(e));
-      renderList('todo');saveState();
-      document.getElementById('dayInsight').innerText='Лиса загрузила '+evs.length+' событий из календаря.';
-    } else {
-      document.getElementById('dayInsight').innerText='В календаре на сегодня событий нет.';
+  const proxies=['https://api.allorigins.win/raw?url=','https://corsproxy.io/?'];
+  document.getElementById('dayInsight').innerText='Загружаю календарь...';
+  // Barnaul UTC+7 date
+  const now=new Date();
+  const barnaul=new Date(now.getTime()+7*3600000);
+  const today=barnaul.toISOString().slice(0,10).replace(/-/g,'');
+  let txt='';
+  for(const proxy of proxies){
+    try{const r=await fetch(proxy+encodeURIComponent(ICS),{signal:AbortSignal.timeout(8000)});txt=await r.text();if(txt.includes('VCALENDAR'))break;}catch(e){}
+  }
+  if(!txt){document.getElementById('dayInsight').innerText='Нет соединения с календарём.';return;}
+  const evs=[];
+  (txt.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/g)||[]).forEach(e=>{
+    const dtm=e.match(/DTSTART[^:]*:(\d{8})(?:T(\d{6}))?/);
+    const sum=(e.match(/SUMMARY:(.+)/)||[])[1];
+    if(dtm&&dtm[1]===today&&sum){
+      let label=sum.trim().replace(/\\n/g,' ');
+      if(dtm[2]){const h=dtm[2].slice(0,2),m=dtm[2].slice(2,4);label=h+':'+m+' '+label;}
+      evs.push(label);
     }
-  }catch(ex){document.getElementById('dayInsight').innerText='Не удалось загрузить календарь.';}
+  });
+  if(evs.length){
+    const existing=new Set(state.lists.todo);
+    evs.filter(e=>!existing.has(e)).forEach(e=>state.lists.todo.unshift(e));
+    renderList('todo');saveState();
+    document.getElementById('dayInsight').innerText='Загружено из Календаря: '+evs.length+' событий.';
+  } else {
+    document.getElementById('dayInsight').innerText='В Календаре на сегодня ('+today.slice(6,8)+'.'+today.slice(4,6)+') событий нет.';
+  }
 }
 
 </script>
