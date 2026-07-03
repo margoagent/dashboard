@@ -242,16 +242,28 @@ document.addEventListener('click',saveState);
 
 // Google Calendar ICS → todo list
 async function loadCalendar(){
-  const ICS='https://calendar.google.com/calendar/ical/hmurova%40gmail.com/private-830ed895fd959d8f9458c6a2fe4effe8/basic.ics';
-  const proxies=['https://api.allorigins.win/raw?url=','https://corsproxy.io/?'];
   document.getElementById('dayInsight').innerText='Загружаю календарь...';
-  // Barnaul UTC+7 date
-  const now=new Date();
-  const barnaul=new Date(now.getTime()+7*3600000);
-  const today=barnaul.toISOString().slice(0,10).replace(/-/g,'');
-  let txt='';
-  for(const proxy of proxies){
-    try{const r=await fetch(proxy+encodeURIComponent(ICS),{signal:AbortSignal.timeout(8000)});txt=await r.text();if(txt.includes('VCALENDAR'))break;}catch(e){}
+  try{
+    const url='https://raw.githubusercontent.com/margoagent/dashboard/main/calendar_today.json?t='+Date.now();
+    const r=await fetch(url,{cache:'no-store'});
+    const data=await r.json();
+    const today=new Date();
+    const barnaul=new Date(today.getTime()+7*3600000);
+    const todayStr=barnaul.toISOString().slice(0,10);
+    if(data.date!==todayStr){
+      document.getElementById('dayInsight').innerText='Данные за '+data.date+'. Обновляется каждые 15 мин.';
+    }
+    const evs=data.events||[];
+    if(evs.length){
+      const existing=new Set(state.lists.todo);
+      evs.filter(e=>!existing.has(e)).forEach(e=>state.lists.todo.unshift(e));
+      renderList('todo');saveState();
+      document.getElementById('dayInsight').innerText='Загружено: '+evs.join(', ');
+    }else{
+      document.getElementById('dayInsight').innerText='В календаре на сегодня событий нет.';
+    }
+  }catch(ex){document.getElementById('dayInsight').innerText='Ошибка загрузки: '+ex.message;}
+}
   }
   if(!txt){document.getElementById('dayInsight').innerText='Нет соединения с календарём.';return;}
   const evs=[];
