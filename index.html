@@ -235,10 +235,11 @@ function openSkill(){document.getElementById('skillModal').classList.add('show')
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();praise()}
 renderAll();
 
+var _calEvents=["15:00 Круги советниц", "23:00 Диагностическая сессия — Neurointegration Institute"];
 // localStorage
 function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
 function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects}))}catch(e){}}
-(function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;renderAll();}catch(e){}})();
+(function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;}catch(e){}var baked=window._calEvents||[];var ex=new Set(state.lists.todo);var add=baked.filter(function(e){return !ex.has(e);});if(add.length){state.lists.todo=add.concat(state.lists.todo);}renderAll();})();
 document.addEventListener('click',saveState);
 
 // Calendar from GitHub JSON
