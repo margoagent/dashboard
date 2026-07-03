@@ -92,16 +92,16 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
     <div class="card">
       <div class="title"><h2>🏠 Тепловая карта сфер жизни</h2><span class="small">все сферы</span></div>
       <div class="lifeMap">
-        <div class="room glow" id="roomSelf"><b>🌿 Я</b><span>энергия есть</span></div>
-        <div class="room dim" id="roomHusband"><b>❤️ Муж</b><span>просит тепла</span></div>
-        <div class="room" id="roomD8"><b>👧 Дочь 8</b><span>контакт есть</span></div>
-        <div class="room" id="roomS4"><b>👦 Сын 4</b><span>игра</span></div>
-        <div class="room glow" id="roomD2"><b>👶 Дочь 2</b><span>много мамы</span></div>
-        <div class="room glow" id="roomWork"><b>🎨 Проекты</b><span>много фокуса</span></div>
-        <div class="room" id="roomMoney"><b>💰 Деньги</b><span>идеи дохода</span></div>
-        <div class="room dim" id="roomRest"><b>🛁 Отдых</b><span>мало восстановления</span></div>
-        <div class="room" id="roomHome"><b>🏡 Дом</b><span>быт</span></div>
-        <div class="room" id="roomMeaning"><b>📚 Дни</b><span>архив прожитого</span></div>
+        <div class="room" id="roomSelf"><b>🌿 Я</b><span>—</span></div>
+        <div class="room" id="roomHusband"><b>❤️ Муж</b><span>—</span></div>
+        <div class="room" id="roomD8"><b>👧 Дочь 8</b><span>—</span></div>
+        <div class="room" id="roomS4"><b>👦 Сын 4</b><span>—</span></div>
+        <div class="room" id="roomD2"><b>👶 Дочь 2</b><span>—</span></div>
+        <div class="room" id="roomWork"><b>🎨 Проекты</b><span>—</span></div>
+        <div class="room" id="roomMoney"><b>💰 Деньги</b><span>—</span></div>
+        <div class="room" id="roomRest"><b>🛁 Отдых</b><span>—</span></div>
+        <div class="room" id="roomHome"><b>🏡 Дом</b><span>—</span></div>
+        <div class="room" id="roomMeaning"><b>📚 Дни</b><span>—</span></div>
       </div>
     </div>
 
@@ -210,7 +210,7 @@ const state={
  skills:[],
  ideas:[]
 };
-function renderList(k){let el=document.getElementById(k+'List');if(!el)return;el.innerHTML=state.lists[k].map(t=>`<div class="check"><span class="box" onclick="toggleBox(this,'${k}')"></span><span>${t}</span></div>`).join('')}
+function renderList(k){let el=document.getElementById(k+'List');if(!el)return;el.innerHTML=state.lists[k].map((t,i)=>`<div class="check"><span class="box" onclick="toggleBox(this,'${k}')"></span><span style="flex:1">${t}</span><span onclick="deleteItem('${k}',${i})" style="color:#ccc;font-size:18px;padding:0 4px;cursor:pointer">×</span></div>`).join('')}
 function renderAll(){Object.keys(state.lists).forEach(renderList);renderProjects();renderSkills();updateLogic()}
 function renderProjects(){document.getElementById('projectList').innerHTML=state.projects.map((p,i)=>`<div class="project" id="proj${i}"><div style="display:flex;justify-content:space-between"><b>${p.name}</b><span class="small">вес ${p.energy}%</span></div><div class="bar"><i style="width:${p.energy}%"></i></div><div class="quiet">Последний шаг был ${p.days} дней назад.</div><div class="actions"><button class="ghost mini" onclick="stepProject(${i})">сделала шаг</button><button class="ghost mini" onclick="releaseProject(${i})">отпустить</button></div></div>`).join('')}
 function line(t,v,g){return `<div class="skillLine"><span>${t}</span><div class="bar"><i style="width:${v}%;background:${g?'linear-gradient(90deg,var(--gold),#f6db8f)':''}"></i></div><span>${v}%</span></div>`}
@@ -236,6 +236,7 @@ function addSkill(){let n=document.getElementById('skillName').value.trim();if(!
 renderAll();
 
 // localStorage
+function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
 function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects}))}catch(e){}}
 (function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;renderAll();}catch(e){}})();
 document.addEventListener('click',saveState);
