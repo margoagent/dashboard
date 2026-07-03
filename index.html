@@ -217,7 +217,7 @@ function renderProjects(){document.getElementById('projectList').innerHTML=state
 function line(t,v,g){return `<div class="skillLine"><span>${t}</span><div class="bar"><i style="width:${v}%;background:${g?'linear-gradient(90deg,var(--gold),#f6db8f)':''}"></i></div><span>${v}%</span></div>`}
 function renderSkills(){document.getElementById('skillList').innerHTML=state.skills.map((s,i)=>`<div class="project"><div style="display:flex;justify-content:space-between;align-items:center"><b>${s[0]}</b><span onclick="deleteSkill(${i})" style="color:#ccc;font-size:20px;cursor:pointer;padding:0 4px">×</span></div>${line('изучила',s[1])}${line('применила',s[2])}<div class="skillLine"><span>заработала</span><div class="bar"><i style="width:${Math.min(s[3]/10000*100,100)}%;background:linear-gradient(90deg,var(--gold),#f6db8f)"></i></div><span>${s[3].toLocaleString('ru')} ₽</span></div></div>`).join('')}
 function deleteSkill(i){state.skills.splice(i,1);renderSkills();saveState();}
-function toggleBox(el,k,i){el.classList.toggle('done');var done=el.classList.contains('done');state.done[k]+=done?1:-1;if(!state.checkedItems)state.checkedItems={todo:[],habit:[],relation:[],intimacy:[]};if(!state.checkedItems[k])state.checkedItems[k]=[];var t=state.lists[k][i];if(done){if(!state.checkedItems[k].includes(t))state.checkedItems[k].push(t);}else{state.checkedItems[k]=state.checkedItems[k].filter(function(x){return x!==t;});}praise();updateLogic();saveState();}
+function toggleBox(el,k,i){el.classList.toggle('done');var done=el.classList.contains('done');state.done[k]+=done?1:-1;if(!state.checkedItems)state.checkedItems={todo:[],habit:[],relation:[],intimacy:[]};if(!state.checkedItems[k])state.checkedItems[k]=[];var t=state.lists[k][i];if(done){if(!state.checkedItems[k].includes(t))state.checkedItems[k].push(t);}else{state.checkedItems[k]=state.checkedItems[k].filter(function(x){return x!==t;});}praise();updateLogic();saveState();renderHabitHistory();}
 function updateLogic(){let energy=state.done.todo*3+state.done.habit*4;let life=state.done.relation*6+state.done.todo*3+state.done.habit*2;document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=energy+'%';document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=life+'%';if(state.done.relation>1){document.getElementById('roomHusband').className='room glow';document.getElementById('roomHusband').querySelector('span').innerText='потеплело';}}
 function praise(){let m=['Лиса видит: один шаг уже считается.','Мягко и достаточно. Без самокритики.','Ты не бросила себя — это главное.'];document.getElementById('dayInsight').innerText=m[Math.floor(Math.random()*m.length)]}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{let t=b.dataset.tab;document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(t).classList.add('active');document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll(`[data-tab="${t}"]`).forEach(x=>x.classList.add('active'))})
@@ -246,7 +246,32 @@ function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
 function todayStr(){return new Date().toLocaleDateString('ru-RU');}
 function toggleIntimacy(){var el=document.getElementById('intimacyList');var arr=document.getElementById('intimacyArrow');if(el.style.display==='none'){el.style.display='';arr.innerText='▲';}else{el.style.display='none';arr.innerText='▼';}}
 function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects,skills:state.skills,checkedItems:state.checkedItems||{},habitHistory:state.habitHistory||{},savedDate:todayStr()}))}catch(e){}}
-function renderHabitHistory(){var h=state.habitHistory||{};var days=Object.keys(h).slice(-7);if(!days.length)return;var total=state.lists.habit.length||1;var html='<div style="font-size:12px;color:#aaa;margin-bottom:4px">История (7 дней)</div><div style="display:flex;gap:6px;flex-wrap:wrap">';days.forEach(function(d){var done=(h[d]||[]).length;var pct=Math.round(done/total*100);var color=pct>=80?'#8fb27d':pct>=50?'#d4e8cc':'#f3f6fb';var txt=pct>=80?'#2b2730':pct>=50?'#2b2730':'#aaa';html+='<div style="background:'+color+';border-radius:8px;padding:4px 8px;font-size:11px;color:'+txt+'">'+d.slice(0,5)+' '+done+'/'+state.lists.habit.length+'</div>';});html+='</div>';var el=document.getElementById('habitHistory');if(el)el.innerHTML=html;}
+function renderHabitHistory(){
+  var el=document.getElementById('habitHistory');if(!el)return;
+  var h=state.habitHistory||{};
+  var total=state.lists.habit.length;
+  if(!total){el.innerHTML='';return;}
+  var days=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  var today=new Date();
+  var html='<div style="font-size:11px;color:#aaa;margin-bottom:6px">Неделя привычек</div><div style="display:flex;gap:4px;justify-content:space-between">';
+  for(var i=6;i>=0;i--){
+    var d=new Date(today);d.setDate(today.getDate()-i);
+    var dStr=d.toLocaleDateString('ru-RU');
+    var isToday=i===0;
+    var checked=isToday?(state.checkedItems&&state.checkedItems.habit?state.checkedItems.habit.length:0):(h[dStr]?h[dStr].length:0);
+    var pct=total?Math.round(checked/total*100):0;
+    var hasFuture=d>today;
+    var bg=hasFuture?'#f3f6fb':pct>=80?'#8fb27d':pct>=50?'#d4e8cc':checked>0?'#eef5e9':'#f3f6fb';
+    var txt=pct>=80?'#fff':pct>=50?'#2b2730':'#aaa';
+    var border=isToday?'2px solid #8fb27d':'2px solid transparent';
+    html+='<div style="flex:1;text-align:center;border:'+border+';border-radius:10px;padding:6px 2px;background:'+bg+'">';
+    html+='<div style="font-size:10px;color:#aaa;margin-bottom:2px">'+days[d.getDay()]+'</div>';
+    html+='<div style="font-size:12px;font-weight:700;color:'+txt+'">'+(hasFuture?'':checked+'/'+total)+'</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
 (function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;if(s.skills)state.skills=s.skills;if(s.checkedItems)state.checkedItems=s.checkedItems;if(s.habitHistory)state.habitHistory=s.habitHistory;if(!state.lists.intimacy||!state.lists.intimacy.length)state.lists.intimacy=['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание'];var today=todayStr();if(s.savedDate&&s.savedDate!==today&&s.checkedItems&&s.checkedItems.habit&&s.checkedItems.habit.length){if(!state.habitHistory)state.habitHistory={};state.habitHistory[s.savedDate]=s.checkedItems.habit;if(!state.checkedItems)state.checkedItems={};state.checkedItems.habit=[];state.done.habit=0;}}catch(e){}var baked=window._calEvents||[];var ex=new Set(state.lists.todo);var add=baked.filter(function(e){return !ex.has(e);});if(add.length){state.lists.todo=add.concat(state.lists.todo);}renderAll();renderHabitHistory();})();
 document.addEventListener('click',saveState);
 
