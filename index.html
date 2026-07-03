@@ -72,8 +72,8 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
     <div class="card">
       <div class="title"><h2>Живу ли я той жизнью?</h2><span class="small">сегодня</span></div>
       <div class="grid2">
-        <div class="metric"><b id="energyTxt">67%</b><span>энергия</span><div class="bar"><i id="energyBar" style="width:67%"></i></div></div>
-        <div class="metric"><b id="lifeTxt">58%</b><span>своя жизнь</span><div class="bar"><i id="lifeBar" style="width:58%"></i></div></div>
+        <div class="metric"><b id="energyTxt">0%</b><span>энергия</span><div class="bar"><i id="energyBar" style="width:0%"></i></div></div>
+        <div class="metric"><b id="lifeTxt">0%</b><span>своя жизнь</span><div class="bar"><i id="lifeBar" style="width:0%"></i></div></div>
       </div>
     </div>
 
@@ -158,7 +158,7 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
   <section id="money" class="section">
     <div class="card">
       <div class="title"><h2>💰 Деньги: приход</h2><button class="ghost mini" onclick="addIncome()">+ приход</button></div>
-      <div class="grid2"><div class="metric"><b id="incomeTotal">0</b><span>месяц</span></div><div class="metric"><b id="incomeCount">0</b><span>источников</span></div></div>
+      <div class="grid2"><div class="metric"><b>0</b><span>месяц</span></div><div class="metric"><b>0</b><span>источников</span></div></div>
       <div id="income"></div>
     </div>
     <div class="card">
@@ -168,7 +168,7 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
     </div>
     <div class="card">
       <div class="title"><h2>🚀 Идея дохода дня</h2><button class="ghost mini" onclick="newIdea()">ещё</button></div>
-      <div class="support" id="incomeIdea">Нажми чтобы получить идею для монетизации.</div>
+      <div class="support" id="incomeIdea">Нажми чтобы получить идею.</div>
     </div>
   </section>
 
@@ -220,59 +220,9 @@ function updateLogic(){let energy=state.done.todo*3+state.done.habit*4;let life=
 function praise(){let m=['Лиса видит: один шаг уже считается.','Мягко и достаточно. Без самокритики.','Ты не бросила себя — это главное.'];document.getElementById('dayInsight').innerText=m[Math.floor(Math.random()*m.length)]}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{let t=b.dataset.tab;document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(t).classList.add('active');document.querySelectorAll('[data-tab]').forEach(x=>x.classList.remove('active'));document.querySelectorAll(`[data-tab="${t}"]`).forEach(x=>x.classList.add('active'))})
 function openAdd(l){state.activeList=l;document.getElementById('modal').classList.add('show')}function closeModal(){document.getElementById('modal').classList.remove('show')}
-function addItem(){let v=document.getElementById('newItemText').value.trim();if(!v)return;if(state.activeList==='project')state.projects.push({name:v,days:0,energy:45});else state.lists[state.activeList].push(v);document.getElementById('newItemText').value='';closeModal();renderAll();
-
-let _contactId='',_contactName='';
-const _contactLevels={'живой контакт':5,'была рядом':3,'отвлекалась':1};
-const _state2=(localStorage.getItem('lisaFamily')?JSON.parse(localStorage.getItem('lisaFamily')):{});
-function contactModal(id,name){_contactId=id;_contactName=name;document.getElementById('contactTitle').innerText=name;document.getElementById('contactModal').style.display='flex';}
-function logContact(type,icon){
-  _state2[_contactId]=(_state2[_contactId]||0)+_contactLevels[type];
-  localStorage.setItem('lisaFamily',JSON.stringify(_state2));
-  document.getElementById('contactModal').style.display='none';
-  updateTrees();
-  document.getElementById('dayInsight').innerText=_contactName+': '+type+' ✓';
-}
-function updateTrees(){
-  const map={pH:'tH',pD8:'tD8',pS4:'tS4',pD2:'tD2'};
-  const smap={pH:'sH',pD8:'sD8',pS4:'sS4',pD2:'sD2'};
-  Object.keys(map).forEach(id=>{
-    const v=Math.min(_state2[id]||0,10);
-    const trees=Math.round(v/2);
-    document.getElementById(map[id]).innerText='🌳'.repeat(trees)+'🌱'.repeat(5-trees);
-    const types=['нажми чтобы отметить','отвлекалась','была рядом','живой контакт','отлично','идеально'];
-    document.getElementById(smap[id]).innerText=types[Math.min(trees,5)];
-  });
-}
-updateTrees();
-praise()}
+function addItem(){let v=document.getElementById('newItemText').value.trim();if(!v)return;if(state.activeList==='project')state.projects.push({name:v,days:0,energy:45});else state.lists[state.activeList].push(v);document.getElementById('newItemText').value='';closeModal();renderAll();praise()}
 function beforeNewProject(){openAdd('project')}
-function stepProject(i){state.projects[i].days=0;state.projects[i].energy=Math.max(10,state.projects[i].energy-14);renderAll();
-
-let _contactId='',_contactName='';
-const _contactLevels={'живой контакт':5,'была рядом':3,'отвлекалась':1};
-const _state2=(localStorage.getItem('lisaFamily')?JSON.parse(localStorage.getItem('lisaFamily')):{});
-function contactModal(id,name){_contactId=id;_contactName=name;document.getElementById('contactTitle').innerText=name;document.getElementById('contactModal').style.display='flex';}
-function logContact(type,icon){
-  _state2[_contactId]=(_state2[_contactId]||0)+_contactLevels[type];
-  localStorage.setItem('lisaFamily',JSON.stringify(_state2));
-  document.getElementById('contactModal').style.display='none';
-  updateTrees();
-  document.getElementById('dayInsight').innerText=_contactName+': '+type+' ✓';
-}
-function updateTrees(){
-  const map={pH:'tH',pD8:'tD8',pS4:'tS4',pD2:'tD2'};
-  const smap={pH:'sH',pD8:'sD8',pS4:'sS4',pD2:'sD2'};
-  Object.keys(map).forEach(id=>{
-    const v=Math.min(_state2[id]||0,10);
-    const trees=Math.round(v/2);
-    document.getElementById(map[id]).innerText='🌳'.repeat(trees)+'🌱'.repeat(5-trees);
-    const types=['нажми чтобы отметить','отвлекалась','была рядом','живой контакт','отлично','идеально'];
-    document.getElementById(smap[id]).innerText=types[Math.min(trees,5)];
-  });
-}
-updateTrees();
-praise()}
+function stepProject(i){state.projects[i].days=0;state.projects[i].energy=Math.max(10,state.projects[i].energy-14);renderAll();praise()}
 function releaseProject(i){let el=document.getElementById('proj'+i);el.innerHTML='<div class="support">✨ Спасибо. Ты выбрала отпустить. Это завершение, а не провал. Хвост превращается в птицу 🕊</div>';setTimeout(()=>{state.projects.splice(i,1);renderAll()},1100)}
 function addCheckin(){let time=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});document.getElementById('checkins').insertAdjacentHTML('afterbegin',`<div class="note"><b>${time}</b><p class="small">Что слышу? Что чувствую? Чего хочу? Где моё тело?</p></div>`)}
 function autoFillDay(){document.getElementById('dayInsight').innerText='Лиса собрала день: 2 дела из календаря, 3 привычки, 1 хвост и один семейный контакт. Остальное можно не трогать.'}
@@ -285,91 +235,47 @@ function openSkill(){document.getElementById('skillModal').classList.add('show')
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();praise()}
 renderAll();
 
-let _contactId='',_contactName='';
-const _contactLevels={'живой контакт':5,'была рядом':3,'отвлекалась':1};
-const _state2=(localStorage.getItem('lisaFamily')?JSON.parse(localStorage.getItem('lisaFamily')):{});
-function contactModal(id,name){_contactId=id;_contactName=name;document.getElementById('contactTitle').innerText=name;document.getElementById('contactModal').style.display='flex';}
-function logContact(type,icon){
-  _state2[_contactId]=(_state2[_contactId]||0)+_contactLevels[type];
-  localStorage.setItem('lisaFamily',JSON.stringify(_state2));
-  document.getElementById('contactModal').style.display='none';
-  updateTrees();
-  document.getElementById('dayInsight').innerText=_contactName+': '+type+' ✓';
-}
-function updateTrees(){
-  const map={pH:'tH',pD8:'tD8',pS4:'tS4',pD2:'tD2'};
-  const smap={pH:'sH',pD8:'sD8',pS4:'sS4',pD2:'sD2'};
-  Object.keys(map).forEach(id=>{
-    const v=Math.min(_state2[id]||0,10);
-    const trees=Math.round(v/2);
-    document.getElementById(map[id]).innerText='🌳'.repeat(trees)+'🌱'.repeat(5-trees);
-    const types=['нажми чтобы отметить','отвлекалась','была рядом','живой контакт','отлично','идеально'];
-    document.getElementById(smap[id]).innerText=types[Math.min(trees,5)];
-  });
-}
-updateTrees();
-
-
-// localStorage persistence
-function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects,skills:state.skills,ideas:state.ideas}))}catch(e){}}
-(function loadSaved(){try{const s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;renderAll()}catch(e){}})();
+// localStorage
+function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects}))}catch(e){}}
+(function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;renderAll();}catch(e){}})();
 document.addEventListener('click',saveState);
 
-// Google Calendar ICS → todo list
+// Calendar from GitHub JSON
 async function loadCalendar(){
-  document.getElementById('dayInsight').innerText='Загружаю календарь...';
+  document.getElementById('dayInsight').innerText='Загружаю...';
   try{
-    const url='https://raw.githubusercontent.com/margoagent/dashboard/main/calendar_today.json?t='+Date.now();
-    const r=await fetch(url,{cache:'no-store'});
-    const data=await r.json();
-    const today=new Date();
-    const barnaul=new Date(today.getTime()+7*3600000);
-    const todayStr=barnaul.toISOString().slice(0,10);
-    if(data.date!==todayStr){
-      document.getElementById('dayInsight').innerText='Данные за '+data.date+'. Обновляется каждые 15 мин.';
-    }
-    const evs=data.events||[];
+    var r=await fetch('https://raw.githubusercontent.com/margoagent/dashboard/main/calendar_today.json?t='+Date.now(),{cache:'no-store'});
+    var data=await r.json();
+    var evs=data.events||[];
     if(evs.length){
-      const existing=new Set(state.lists.todo);
-      evs.filter(e=>!existing.has(e)).forEach(e=>state.lists.todo.unshift(e));
+      var existing=new Set(state.lists.todo);
+      evs.filter(function(e){return !existing.has(e);}).forEach(function(e){state.lists.todo.unshift(e);});
       renderList('todo');saveState();
-      document.getElementById('dayInsight').innerText='Загружено: '+evs.join(', ');
+      document.getElementById('dayInsight').innerText='Из Календаря: '+evs.join(', ');
     }else{
-      document.getElementById('dayInsight').innerText='В календаре на сегодня событий нет.';
+      document.getElementById('dayInsight').innerText='В Календаре сегодня событий нет.';
     }
-  }catch(ex){document.getElementById('dayInsight').innerText='Ошибка загрузки: '+ex.message;}
+  }catch(ex){document.getElementById('dayInsight').innerText='Ошибка: '+ex.message;}
 }
-  }
-  if(!txt){document.getElementById('dayInsight').innerText='Нет соединения с календарём.';return;}
-  const evs=[];
-  (txt.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/g)||[]).forEach(e=>{
-    const dtm=e.match(/DTSTART[^:]*:(\d{8})(?:T(\d{6}))?/);
-    const sum=(e.match(/SUMMARY:(.+)/)||[])[1];
-    if(dtm&&dtm[1]===today&&sum){
-      let label=sum.trim().replace(/\\n/g,' ');
-      if(dtm[2]){const h=dtm[2].slice(0,2),m=dtm[2].slice(2,4);label=h+':'+m+' '+label;}
-      evs.push(label);
-    }
-  });
-  if(evs.length){
-    const existing=new Set(state.lists.todo);
-    evs.filter(e=>!existing.has(e)).forEach(e=>state.lists.todo.unshift(e));
-    renderList('todo');saveState();
-    document.getElementById('dayInsight').innerText='Загружено из Календаря: '+evs.length+' событий.';
-  } else {
-    document.getElementById('dayInsight').innerText='В Календаре на сегодня ('+today.slice(6,8)+'.'+today.slice(4,6)+') событий нет.';
-  }
-}
+
+// Family contact modal
+var _cid='',_cname='';
+var _clv={'живой контакт':5,'была рядом':3,'отвлекалась':1};
+var _fam=JSON.parse(localStorage.getItem('lisaFamily')||'{}');
+function contactModal(id,name){_cid=id;_cname=name;document.getElementById('contactTitle').innerText=name;document.getElementById('contactModal').style.display='flex';}
+function logContact(type){_fam[_cid]=(_fam[_cid]||0)+_clv[type];localStorage.setItem('lisaFamily',JSON.stringify(_fam));document.getElementById('contactModal').style.display='none';updateTrees();document.getElementById('dayInsight').innerText=_cname+': '+type+' ✓';}
+function updateTrees(){['H','D8','S4','D2'].forEach(function(k){var v=Math.min(_fam['p'+k]||0,10);var t=Math.round(v/2);document.getElementById('t'+k).innerText='🌳'.repeat(t)+'🌱'.repeat(5-t);document.getElementById('s'+k).innerText=t===0?'нажми чтобы отметить':(t<3?'была рядом':'живой контакт');});}
+updateTrees();
 
 </script>
 
 <div id="contactModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;align-items:flex-end;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
 <div style="width:100%;max-width:430px;background:#fff;border-radius:30px 30px 0 0;padding:20px 16px 32px">
-  <b id="contactTitle" style="font-size:18px"></b>
-  <div style="display:grid;gap:10px;margin-top:16px">
-    <button onclick="logContact('живой контакт','🌳')" style="background:#8fb27d;border-radius:16px;padding:14px;font-size:15px">🌳 Живой контакт</button>
-    <button onclick="logContact('была рядом','🌿')" style="background:#d4e8cc;color:#2b2730;border-radius:16px;padding:14px;font-size:15px">🌿 Была рядом</button>
-    <button onclick="logContact('отвлекалась','🌱')" style="background:#f3f6fb;color:#2b2730;border-radius:16px;padding:14px;font-size:15px">🌱 Отвлекалась</button>
+  <b id="contactTitle" style="font-size:18px;display:block;margin-bottom:16px"></b>
+  <div style="display:grid;gap:10px">
+    <button onclick="logContact('живой контакт')" style="background:#8fb27d;border-radius:16px;padding:14px;font-size:15px;border:0;color:white;font-weight:700">🌳 Живой контакт</button>
+    <button onclick="logContact('была рядом')" style="background:#d4e8cc;color:#2b2730;border-radius:16px;padding:14px;font-size:15px;border:0;font-weight:700">🌿 Была рядом</button>
+    <button onclick="logContact('отвлекалась')" style="background:#f3f6fb;color:#6e6670;border-radius:16px;padding:14px;font-size:15px;border:0;font-weight:700">🌱 Отвлекалась</button>
   </div>
 </div></div>
 </body>
