@@ -235,9 +235,11 @@ function savePct(){localStorage.setItem('pctE',document.getElementById('pEnergy'
 function clearPct(){localStorage.removeItem('pctE');localStorage.removeItem('pctL');document.getElementById('pctModal').style.display='none';updateLogic();}
 function updateLogic(){
   var eManual=localStorage.getItem('pctE');var lManual=localStorage.getItem('pctL');
-  let energy=eManual!==null?+eManual:state.done.todo*3+state.done.habit*4;let life=lManual!==null?+lManual:state.done.relation*6+state.done.todo*3+state.done.habit*2;
-  document.getElementById('energyTxt').innerText=Math.round(energy)+'%';document.getElementById('energyBar').style.width=Math.min(energy,100)+'%';
-  document.getElementById('lifeTxt').innerText=Math.round(life)+'%';document.getElementById('lifeBar').style.width=Math.min(life,100)+'%';
+  var tTodo=state.lists.todo.length||1;var tHabit=state.lists.habit.length||1;var tRel=state.lists.relation.length||1;
+  let energy=eManual!==null?+eManual:Math.round((state.done.todo/tTodo)*50+(state.done.habit/tHabit)*50);
+  let life=lManual!==null?+lManual:Math.round((state.done.todo/tTodo)*35+(state.done.habit/tHabit)*30+(state.done.relation/tRel)*35);
+  document.getElementById('energyTxt').innerText=Math.min(energy,100)+'%';document.getElementById('energyBar').style.width=Math.min(energy,100)+'%';
+  document.getElementById('lifeTxt').innerText=Math.min(life,100)+'%';document.getElementById('lifeBar').style.width=Math.min(life,100)+'%';
   // Я — привычки
   var hDone=state.checkedItems&&state.checkedItems.habit?state.checkedItems.habit.length:0;
   var hTotal=state.lists.habit.length||1;
