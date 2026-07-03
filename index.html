@@ -238,8 +238,9 @@ function updateLogic(){
   var tTodo=state.lists.todo.length||1;var tHabit=state.lists.habit.length||1;var tRel=state.lists.relation.length||1;
   let energy=eManual!==null?+eManual:Math.round((state.done.todo/tTodo)*50+(state.done.habit/tHabit)*50);
   let life=lManual!==null?+lManual:Math.round((state.done.todo/tTodo)*35+(state.done.habit/tHabit)*30+(state.done.relation/tRel)*35);
-  document.getElementById('energyTxt').innerText=Math.min(energy,100)+'%';document.getElementById('energyBar').style.width=Math.min(energy,100)+'%';
-  document.getElementById('lifeTxt').innerText=Math.min(life,100)+'%';document.getElementById('lifeBar').style.width=Math.min(life,100)+'%';
+  energy=Math.max(0,Math.min(energy,100));life=Math.max(0,Math.min(life,100));
+  document.getElementById('energyTxt').innerText=energy+'%';document.getElementById('energyBar').style.width=energy+'%';
+  document.getElementById('lifeTxt').innerText=life+'%';document.getElementById('lifeBar').style.width=life+'%';
   // Я — привычки
   var hDone=state.checkedItems&&state.checkedItems.habit?state.checkedItems.habit.length:0;
   var hTotal=state.lists.habit.length||1;
