@@ -111,9 +111,15 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
       <div id="days"></div>
     </div>
     <div class="card">
-      <div class="title"><h2>🙏 Дневник благодарности</h2><button class="ghost mini" onclick="saveThanks()">сохранить</button></div>
-      <textarea id="thanksText" placeholder="За что я благодарна сегодня? Напиши 3 вещи..." style="width:100%;min-height:80px;border:1.5px solid #e8edf3;border-radius:12px;padding:10px;font-size:14px;font-family:inherit;resize:none;box-sizing:border-box;margin-top:4px"></textarea>
+      <div class="title"><h2>🙏 Благодарность дня</h2></div>
+      <div style="font-size:12px;color:#aaa;margin-bottom:4px">Себе</div>
+      <textarea id="thanksText" placeholder="За что я благодарна себе сегодня?" style="width:100%;min-height:64px;border:1.5px solid #e8edf3;border-radius:12px;padding:10px;font-size:14px;font-family:inherit;resize:none;box-sizing:border-box"></textarea>
+      <button class="ghost mini" style="width:100%;margin-top:6px" onclick="saveThanks()">Сохранить</button>
       <div id="thanksList" style="margin-top:8px"></div>
+      <div style="height:1px;background:#f0f0f0;margin:12px 0"></div>
+      <div style="font-size:12px;color:#aaa;margin-bottom:4px">Анатолию</div>
+      <textarea id="husbandText" placeholder="Что хочу сказать Анатолию сегодня..." style="width:100%;min-height:64px;border:1.5px solid #ffd5ae;border-radius:12px;padding:10px;font-size:14px;font-family:inherit;resize:none;box-sizing:border-box"></textarea>
+      <button style="width:100%;margin-top:6px;background:linear-gradient(135deg,#ff7a1a,#ff9c4a)" onclick="sendToHusband()">❤️ Отправить Анатолию</button>
     </div>
   </section>
 
@@ -280,6 +286,7 @@ function deleteDayCard(i){var days=JSON.parse(localStorage.getItem('lisaDays')||
 function renderDays(){var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');var el=document.getElementById('days');if(!el)return;if(!days.length){el.innerHTML='<div class="support" onclick="addDay()" style="cursor:pointer;text-align:center">📝 Нажми чтобы записать сегодняшний день</div>';return;}el.innerHTML=days.map(function(d,i){return '<div class="note"><div style="display:flex;justify-content:space-between;align-items:center"><b>'+d.emoji+' '+d.date+'</b><span onclick="deleteDayCard('+i+')" style="color:#ccc;font-size:18px;cursor:pointer">×</span></div><p class="small" style="margin:6px 0 0">'+(d.win?'🏆 '+d.win+'<br>':'')+(d.mood?'💭 '+d.mood+'<br>':'')+(d.mem?'⏳ '+d.mem+'<br>':'')+(d.music?'🎵 '+d.music:'')+'</p></div>';}).join('');}
 renderDays();
 function saveThanks(){var t=document.getElementById('thanksText').value.trim();if(!t)return;var arr=JSON.parse(localStorage.getItem('lisaThanks')||'[]');arr.unshift({date:new Date().toLocaleDateString('ru'),text:t});if(arr.length>30)arr=arr.slice(0,30);localStorage.setItem('lisaThanks',JSON.stringify(arr));document.getElementById('thanksText').value='';renderThanks();}
+function sendToHusband(){var t=document.getElementById('husbandText').value.trim();if(!t)return;var url='https://t.me/share/url?url=&text='+encodeURIComponent(t);if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.openLink(url);}else{window.open(url,'_blank');}}
 function renderThanks(){var arr=JSON.parse(localStorage.getItem('lisaThanks')||'[]');var el=document.getElementById('thanksList');if(!el)return;el.innerHTML=arr.slice(0,5).map(function(x){return '<div class="note" style="padding:8px 10px;margin-bottom:6px"><span style="font-size:11px;color:#aaa">'+x.date+'</span><p class="small" style="margin:2px 0 0">'+x.text.replace(/\n/g,'<br>')+'</p></div>';}).join('');}
 renderThanks();
 function addIncome(){document.getElementById('incomeModal').style.display='flex';document.getElementById('incSource').value='';document.getElementById('incAmount').value='';document.getElementById('incSkill').value='';}
