@@ -201,12 +201,12 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
 const state={
  activeList:'todo', done:{todo:0,habit:0,relation:0,intimacy:0},
  lists:{
-  todo:['Главное дело дня','1 живой контакт с семьёй','10 минут на себя'],
+  todo:[],
   habit:['💊 Таблетки','📖 Чтение','🙏 Благодарность','🌙 Сон до 23:00','🥗 Мягкое питание'],
   relation:['💬 Разговор без телефона','🫂 Объятия','☕ Время вдвоём','📖 Чтение ребёнку','🤝 Совместное дело'],
   intimacy:['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание']
  },
- projects:[{name:'🎲 Закончить игру',days:34,energy:72},{name:'📚 Дочитать книгу',days:12,energy:38},{name:'🏡 Разобрать гараж',days:57,energy:64}],
+ projects:[],
  skills:[['Игропрактика',92,64,38],['ИИ / вайбкодинг',86,52,18],['Дизайн продуктов',78,71,26],['Жива',67,20,0]],
  ideas:['Подписка: «365 вопросов для женских кругов».','AI-конструктор раскрасок для экспертов.','Мини-продукт: «7 дней Живы для занятых мам».','Диагностика навыков эксперта.']
 };
@@ -234,6 +234,41 @@ function newIdea(){document.getElementById('incomeIdea').innerText=state.ideas[M
 function openSkill(){document.getElementById('skillModal').classList.add('show')}function closeSkill(){document.getElementById('skillModal').classList.remove('show')}
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();praise()}
 renderAll();
+
+// localStorage persistence
+function saveState(){try{localStorage.setItem('lisaOS',JSON.stringify({lists:state.lists,projects:state.projects,skills:state.skills,ideas:state.ideas}))}catch(e){}}
+(function loadSaved(){try{const s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;if(s.skills)state.skills=s.skills;renderAll()}catch(e){}})();
+document.addEventListener('click',saveState);
+
+// Google Calendar ICS → todo list
+async function loadCalendar(){
+  const ICS='https://calendar.google.com/calendar/ical/hmurova%40gmail.com/private-830ed895fd959d8f9458c6a2fe4effe8/basic.ics';
+  try{
+    const r=await fetch('https://corsproxy.io/?'+encodeURIComponent(ICS));
+    const txt=await r.text();
+    const today=new Date().toISOString().slice(0,10).replace(/-/g,'');
+    const evs=[];
+    (txt.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/g)||[]).forEach(e=>{
+      const dt=(e.match(/DTSTART[^:]*:(\d{8})/)||[])[1];
+      const sum=(e.match(/SUMMARY:(.+)/)||[])[1];
+      const tm=(e.match(/DTSTART[^:]*:T?(\d{6})/)||[])[1];
+      if(dt===today&&sum){
+        let label=sum.trim();
+        if(tm){const h=tm.slice(0,2),m=tm.slice(2,4);label=h+':'+m+' '+label;}
+        evs.push(label);
+      }
+    });
+    if(evs.length){
+      const existing=new Set(state.lists.todo);
+      evs.filter(e=>!existing.has(e)).forEach(e=>state.lists.todo.unshift(e));
+      renderList('todo');saveState();
+      document.getElementById('dayInsight').innerText='Лиса загрузила '+evs.length+' событий из календаря.';
+    } else {
+      document.getElementById('dayInsight').innerText='В календаре на сегодня событий нет.';
+    }
+  }catch(ex){document.getElementById('dayInsight').innerText='Не удалось загрузить календарь.';}
+}
+
 </script>
 </body>
 </html>
