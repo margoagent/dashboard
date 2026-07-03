@@ -158,7 +158,7 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
   <section id="money" class="section">
     <div class="card">
       <div class="title"><h2>💰 Деньги: приход</h2><button class="ghost mini" onclick="addIncome()">+ приход</button></div>
-      <div class="grid2"><div class="metric"><b>0</b><span>месяц</span></div><div class="metric"><b>0</b><span>источников</span></div></div>
+      <div class="grid2"><div class="metric"><b id="incTotal">0</b><span>месяц</span></div><div class="metric"><b id="incCount">0</b><span>источников</span></div></div>
       <div id="income"></div>
     </div>
     <div class="card">
@@ -172,7 +172,7 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
     </div>
   </section>
 
-  <div class="fab" onclick="loadCalendar()">AI</div>
+  
 </div>
 
 <div class="nav">
@@ -231,7 +231,7 @@ function addDay(){document.getElementById('days').insertAdjacentHTML('afterbegin
 function saveThanks(){}
 function addIncome(){document.getElementById('incomeModal').style.display='flex';document.getElementById('incSource').value='';document.getElementById('incAmount').value='';document.getElementById('incSkill').value='';}
 function saveIncome(){var src=document.getElementById('incSource').value.trim();var amt=+document.getElementById('incAmount').value||0;var sk=document.getElementById('incSkill').value.trim();if(!src)return;var inc=JSON.parse(localStorage.getItem('lisaIncome')||'[]');inc.unshift({src:src,amt:amt,sk:sk,date:new Date().toLocaleDateString('ru')});localStorage.setItem('lisaIncome',JSON.stringify(inc));renderIncome();document.getElementById('incomeModal').style.display='none';}
-function renderIncome(){var inc=JSON.parse(localStorage.getItem('lisaIncome')||'[]');var total=inc.reduce(function(s,x){return s+x.amt;},0);document.querySelector('#finances .metric b').innerText=total.toLocaleString('ru');document.querySelector('#finances .metric:nth-child(2) b').innerText=inc.length;var el=document.getElementById('income');if(el){el.innerHTML=inc.map(function(x){return '<div class="note"><b>'+x.src+'</b><p class="small">'+x.amt.toLocaleString('ru')+' ₽'+(x.sk?' · '+x.sk:'')+'<br><span style="color:#aaa;font-size:11px">'+x.date+'</span></p></div>';}).join('');}}
+function renderIncome(){var inc=JSON.parse(localStorage.getItem('lisaIncome')||'[]');var total=inc.reduce(function(s,x){return s+x.amt;},0);var tEl=document.getElementById('incTotal');var cEl=document.getElementById('incCount');if(tEl)tEl.innerText=total.toLocaleString('ru');if(cEl)cEl.innerText=inc.length;var el=document.getElementById('income');if(el){el.innerHTML=inc.map(function(x){return '<div class="note"><b>'+x.src+'</b><p class="small">'+x.amt.toLocaleString('ru')+' ₽'+(x.sk?' · '+x.sk:'')+'<br><span style="color:#aaa;font-size:11px">'+x.date+'</span></p></div>';}).join('');}}
 renderIncome();
 function newIdea(){var ideas=state.ideas.length?state.ideas:['Мастер-класс по настольным играм онлайн','Шаблоны карт для печати — PDF-продукт','Консультация по игровому дизайну','Подписка: «Игра месяца» для семей','Готовый комплект для корпоративных игр'];document.getElementById('incomeIdea').innerText=ideas[Math.floor(Math.random()*ideas.length)];}
 function openSkill(){document.getElementById('skillModal').classList.add('show')}function closeSkill(){document.getElementById('skillModal').classList.remove('show')}
