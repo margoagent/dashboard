@@ -109,6 +109,11 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
       <div class="title"><h2>📚 Карточка прожитого дня</h2><button class="ghost mini" onclick="addDay()">+ день</button></div>
       <div id="days"></div>
     </div>
+    <div class="card">
+      <div class="title"><h2>🙏 Дневник благодарности</h2><button class="ghost mini" onclick="saveThanks()">сохранить</button></div>
+      <textarea id="thanksText" placeholder="За что я благодарна сегодня? Напиши 3 вещи..." style="width:100%;min-height:80px;border:1.5px solid #e8edf3;border-radius:12px;padding:10px;font-size:14px;font-family:inherit;resize:none;box-sizing:border-box;margin-top:4px"></textarea>
+      <div id="thanksList" style="margin-top:8px"></div>
+    </div>
   </section>
 
   <section id="habits" class="section">
@@ -266,7 +271,9 @@ function saveDay(){var win=document.getElementById('dayWin').value.trim();var mo
 function deleteDayCard(i){var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');days.splice(i,1);localStorage.setItem('lisaDays',JSON.stringify(days));renderDays();}
 function renderDays(){var days=JSON.parse(localStorage.getItem('lisaDays')||'[]');var el=document.getElementById('days');if(!el)return;if(!days.length){el.innerHTML='<div class="support">Нажми «+ день» чтобы записать сегодняшний день.</div>';return;}el.innerHTML=days.map(function(d,i){return '<div class="note"><div style="display:flex;justify-content:space-between;align-items:center"><b>'+d.emoji+' '+d.date+'</b><span onclick="deleteDayCard('+i+')" style="color:#ccc;font-size:18px;cursor:pointer">×</span></div><p class="small" style="margin:6px 0 0">'+(d.win?'🏆 '+d.win+'<br>':'')+(d.mood?'💭 '+d.mood+'<br>':'')+(d.mem?'⏳ '+d.mem+'<br>':'')+(d.music?'🎵 '+d.music:'')+'</p></div>';}).join('');}
 renderDays();
-function saveThanks(){}
+function saveThanks(){var t=document.getElementById('thanksText').value.trim();if(!t)return;var arr=JSON.parse(localStorage.getItem('lisaThanks')||'[]');arr.unshift({date:new Date().toLocaleDateString('ru'),text:t});if(arr.length>30)arr=arr.slice(0,30);localStorage.setItem('lisaThanks',JSON.stringify(arr));document.getElementById('thanksText').value='';renderThanks();}
+function renderThanks(){var arr=JSON.parse(localStorage.getItem('lisaThanks')||'[]');var el=document.getElementById('thanksList');if(!el)return;el.innerHTML=arr.slice(0,5).map(function(x){return '<div class="note" style="padding:8px 10px;margin-bottom:6px"><span style="font-size:11px;color:#aaa">'+x.date+'</span><p class="small" style="margin:2px 0 0">'+x.text.replace(/\n/g,'<br>')+'</p></div>';}).join('');}
+renderThanks();
 function addIncome(){document.getElementById('incomeModal').style.display='flex';document.getElementById('incSource').value='';document.getElementById('incAmount').value='';document.getElementById('incSkill').value='';}
 function saveIncome(){var src=document.getElementById('incSource').value.trim();var amt=+document.getElementById('incAmount').value||0;var sk=document.getElementById('incSkill').value.trim();if(!src)return;var inc=JSON.parse(localStorage.getItem('lisaIncome')||'[]');inc.unshift({src:src,amt:amt,sk:sk,date:new Date().toLocaleDateString('ru')});localStorage.setItem('lisaIncome',JSON.stringify(inc));renderIncome();document.getElementById('incomeModal').style.display='none';}
 function deleteIncome(i){var inc=JSON.parse(localStorage.getItem('lisaIncome')||'[]');inc.splice(i,1);localStorage.setItem('lisaIncome',JSON.stringify(inc));renderIncome();}
