@@ -299,7 +299,7 @@ function openSkill(){document.getElementById('skillModal').classList.add('show')
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();saveState();praise()}
 renderAll();
 
-var _calEvents=["LABS: Otkryvayutsya materialy nedeli 3"];
+var _calEvents=["День мужа 7.07", "10:45 Массаж (Юлия Фоминых)", "15:00 Выборы РП", "20:00 ИИ-интенсив (встреча 1)"];
 // localStorage
 function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
 function todayStr(){return new Date().toLocaleDateString('ru-RU');}
