@@ -167,6 +167,11 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
       <div class="title"><h2>📚 Карточка прожитого дня</h2><button class="ghost mini" onclick="addDay()">+ день</button></div>
       <div id="days"></div>
     </div>
+
+    <div class="card">
+      <div class="title"><h2>🗂️ Архив дел</h2><span class="small">последние 14 дней</span></div>
+      <div id="todoHistoryList"></div>
+    </div>
   </section>
 
   <section id="money" class="section">
@@ -229,7 +234,7 @@ const state={
  ideas:[]
 };
 function renderList(k){let el=document.getElementById(k+'List');if(!el)return;let ch=new Set((state.checkedItems&&state.checkedItems[k])||[]);el.innerHTML=state.lists[k].map((t,i)=>`<div class="check"><span class="box${ch.has(t)?' done':''}" onclick="toggleBox(this,'${k}',${i})"></span><span style="flex:1;${ch.has(t)?'text-decoration:line-through;opacity:.5':''}">${t}</span><span onclick="deleteItem('${k}',${i})" style="color:#ccc;font-size:18px;padding:0 4px;cursor:pointer">×</span></div>`).join('')}
-function renderAll(){Object.keys(state.lists).forEach(renderList);renderProjects();renderSkills();updateLogic()}
+function renderAll(){Object.keys(state.lists).forEach(renderList);renderProjects();renderSkills();updateLogic();renderTodoHistory()}
 function setProjectEnergy(i,v){state.projects[i].energy=+v;saveState();var bar=document.getElementById('pbar'+i);if(bar)bar.style.width=v+'%';}
 function renderProjects(){document.getElementById('projectList').innerHTML=state.projects.map((p,i)=>`<div class="project" id="proj${i}"><div style="display:flex;justify-content:space-between;align-items:center"><b>${p.name}</b><span class="small" style="color:#aaa">${p.energy}%</span></div><input type="range" min="5" max="100" value="${p.energy}" style="width:100%;margin:6px 0" oninput="setProjectEnergy(${i},this.value);this.previousElementSibling.querySelector('span').innerText=this.value+'%'"><div class="bar"><i id="pbar${i}" style="width:${p.energy}%"></i></div><div class="quiet">Последний шаг был ${p.days} дней назад.</div><div class="actions"><button class="ghost mini" onclick="stepProject(${i})">сделала шаг</button><button class="ghost mini" onclick="releaseProject(${i})">отпустить</button></div></div>`).join('')}
 function line(t,v,g){return `<div class="skillLine"><span>${t}</span><div class="bar"><i style="width:${v}%;background:${g?'linear-gradient(90deg,var(--gold),#f6db8f)':''}"></i></div><span>${v}%</span></div>`}
@@ -331,6 +336,21 @@ function renderHabitHistory(){
   }
   html+='</div>';
   el.innerHTML=html;
+}
+function renderTodoHistory(){
+  var el=document.getElementById('todoHistoryList');if(!el)return;
+  var h=state.todoHistory||{};
+  var dates=Object.keys(h).sort().reverse().slice(0,14);
+  if(!dates.length){el.innerHTML='<div class="support">Архив пока пуст — появится после первого дня.</div>';return;}
+  el.innerHTML=dates.map(function(d){
+    var entry=h[d];
+    var doneSet=new Set(entry.done||[]);
+    var items=(entry.list||[]).map(function(t){
+      var isDone=doneSet.has(t);
+      return '<div style="font-size:13px;'+(isDone?'text-decoration:line-through;opacity:.5':'')+'">'+(isDone?'✓ ':'○ ')+t+'</div>';
+    }).join('');
+    return '<div class="note" style="margin-bottom:8px"><b>'+d+'</b>'+items+'</div>';
+  }).join('');
 }
 (function(){try{var s=JSON.parse(localStorage.getItem('lisaOS')||'{}');if(s.lists)state.lists=s.lists;if(s.projects)state.projects=s.projects;if(s.skills)state.skills=s.skills;if(s.checkedItems)state.checkedItems=s.checkedItems;if(s.habitHistory)state.habitHistory=s.habitHistory;if(s.todoHistory)state.todoHistory=s.todoHistory;if(s.checkedItems){Object.keys(state.done).forEach(function(k){state.done[k]=(s.checkedItems[k]||[]).length;});}if(!state.lists.intimacy||!state.lists.intimacy.length)state.lists.intimacy=['○ Нет ресурса','○ Только побыть рядом','○ Хочу объятий','○ Хочу романтики','○ Есть желание'];var today=todayStr();if(s.savedDate&&s.savedDate!==today&&s.checkedItems&&s.checkedItems.habit&&s.checkedItems.habit.length){if(!state.habitHistory)state.habitHistory={};state.habitHistory[s.savedDate]=s.checkedItems.habit;if(!state.checkedItems)state.checkedItems={};state.checkedItems.habit=[];state.done.habit=0;}if(s.savedDate&&s.savedDate!==today&&state.lists.todo&&state.lists.todo.length){if(!state.todoHistory)state.todoHistory={};state.todoHistory[s.savedDate]={list:state.lists.todo,done:(s.checkedItems&&s.checkedItems.todo)||[]};state.lists.todo=[];if(!state.checkedItems)state.checkedItems={};state.checkedItems.todo=[];state.done.todo=0;}}catch(e){}var baked=window._calEvents||[];var ex=new Set(state.lists.todo);var add=baked.filter(function(e){return !ex.has(e);});if(add.length){state.lists.todo=add.concat(state.lists.todo);}renderAll();renderHabitHistory();})();
 document.addEventListener('click',saveState);
