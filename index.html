@@ -299,7 +299,7 @@ function openSkill(){document.getElementById('skillModal').classList.add('show')
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();saveState();praise()}
 renderAll();
 
-var _calEvents=["19:00 LABS: Мастер-класс — Воронка продаж", "20:00 Встреча проектного комитета"];
+var _calEvents=["13:00 Университет"];
 // localStorage
 function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
 function todayStr(){return new Date().toLocaleDateString('ru-RU');}
