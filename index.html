@@ -70,46 +70,11 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
 
   <section id="home" class="section active">
     <div class="card">
-      <div class="title"><h2>Живу ли я той жизнью?</h2><span class="small">сегодня</span></div>
-      <div class="grid2">
-        <div class="metric"><b id="energyTxt">0%</b><span>энергия</span><div class="bar"><i id="energyBar" style="width:0%"></i></div></div>
-        <div class="metric"><b id="lifeTxt">0%</b><span>своя жизнь</span><div class="bar"><i id="lifeBar" style="width:0%"></i></div></div>
-      </div>
-      <div style="text-align:right;margin-top:6px"><span onclick="openPct()" style="font-size:12px;color:#aaa;cursor:pointer;text-decoration:underline">✏️ выставить вручную</span></div>
-    </div>
-
-    <div class="card">
       <div class="title"><h2>✅ Список дел на день</h2><button class="ghost mini" onclick="openAdd('todo')">+ дело</button></div>
       <div id="todoList"></div>
       <div class="support">Может синхронизироваться с календарём: встречи подтягиваются автоматически, а дела можно создавать вручную.</div>
     </div>
 
-    <div class="card">
-      <div class="title"><h2>🤖 Главный экран дня</h2><button class="ghost mini" onclick="autoFillDay()">заполнить</button></div>
-      <div class="support" id="dayInsight">Сам может собираться из календаря, привычек, хвостов и семейного баланса. Но «чего я хочу» лучше оставлять как живой вопрос к себе.</div>
-      <textarea id="wantInput" placeholder="Чего я хочу сегодня?"></textarea>
-    </div>
-
-    <div class="card">
-      <div class="title"><h2>🏠 Тепловая карта сфер жизни</h2><span class="small">все сферы</span></div>
-      <div class="lifeMap">
-        <div class="room" id="roomSelf"><b>🌿 Я</b><span>—</span></div>
-        <div class="room" id="roomHusband"><b>❤️ Анатолий</b><span>—</span></div>
-        <div class="room" id="roomD8"><b>👧 Арина</b><span>—</span></div>
-        <div class="room" id="roomS4"><b>👦 Арсений</b><span>—</span></div>
-        <div class="room" id="roomD2"><b>👶 Ангелина</b><span>—</span></div>
-        <div class="room" id="roomWork"><b>🎨 Проекты</b><span>—</span></div>
-        <div class="room" id="roomMoney"><b>💰 Деньги</b><span>—</span></div>
-        <div class="room" id="roomRest"><b>🛁 Отдых</b><span>—</span></div>
-        <div class="room" id="roomHome"><b>🏡 Дом</b><span>—</span></div>
-        <div class="room" id="roomMeaning"><b>📚 Дни</b><span>—</span></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="title"><h2>📚 Карточка прожитого дня</h2><button class="ghost mini" onclick="addDay()">+ день</button></div>
-      <div id="days"></div>
-    </div>
     <div class="card">
       <div class="title"><h2>🙏 Благодарность дня</h2></div>
       <div style="font-size:12px;color:#aaa;margin-bottom:4px">Себе</div>
@@ -165,6 +130,42 @@ input,textarea,select{width:100%;border:none;outline:none;background:#fff;border
       <div class="title"><h2>🪶 Что забирает энергию?</h2><button class="mini" onclick="beforeNewProject()">+ проект</button></div>
       <div class="support">Ритуал завершения теперь внутри кнопки «отпустить» у каждого хвоста.</div>
       <div id="projectList"></div>
+    </div>
+
+    <div class="card">
+      <div class="title"><h2>Живу ли я той жизнью?</h2><span class="small">сегодня</span></div>
+      <div class="grid2">
+        <div class="metric"><b id="energyTxt">0%</b><span>энергия</span><div class="bar"><i id="energyBar" style="width:0%"></i></div></div>
+        <div class="metric"><b id="lifeTxt">0%</b><span>своя жизнь</span><div class="bar"><i id="lifeBar" style="width:0%"></i></div></div>
+      </div>
+      <div style="text-align:right;margin-top:6px"><span onclick="openPct()" style="font-size:12px;color:#aaa;cursor:pointer;text-decoration:underline">✏️ выставить вручную</span></div>
+    </div>
+
+    <div class="card">
+      <div class="title"><h2>🤖 Главный экран дня</h2><button class="ghost mini" onclick="autoFillDay()">заполнить</button></div>
+      <div class="support" id="dayInsight">Сам может собираться из календаря, привычек, хвостов и семейного баланса. Но «чего я хочу» лучше оставлять как живой вопрос к себе.</div>
+      <textarea id="wantInput" placeholder="Чего я хочу сегодня?"></textarea>
+    </div>
+
+    <div class="card">
+      <div class="title"><h2>🏠 Тепловая карта сфер жизни</h2><span class="small">все сферы</span></div>
+      <div class="lifeMap">
+        <div class="room" id="roomSelf"><b>🌿 Я</b><span>—</span></div>
+        <div class="room" id="roomHusband"><b>❤️ Анатолий</b><span>—</span></div>
+        <div class="room" id="roomD8"><b>👧 Арина</b><span>—</span></div>
+        <div class="room" id="roomS4"><b>👦 Арсений</b><span>—</span></div>
+        <div class="room" id="roomD2"><b>👶 Ангелина</b><span>—</span></div>
+        <div class="room" id="roomWork"><b>🎨 Проекты</b><span>—</span></div>
+        <div class="room" id="roomMoney"><b>💰 Деньги</b><span>—</span></div>
+        <div class="room" id="roomRest"><b>🛁 Отдых</b><span>—</span></div>
+        <div class="room" id="roomHome"><b>🏡 Дом</b><span>—</span></div>
+        <div class="room" id="roomMeaning"><b>📚 Дни</b><span>—</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title"><h2>📚 Карточка прожитого дня</h2><button class="ghost mini" onclick="addDay()">+ день</button></div>
+      <div id="days"></div>
     </div>
   </section>
 
