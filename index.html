@@ -305,7 +305,7 @@ function openSkill(){document.getElementById('skillModal').classList.add('show')
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();saveState();praise()}
 renderAll();
 
-var _calEvents=["11:30 Красота — мастер Марина (Idilliya)", "13:30 Фотосессия — студия Fotodom", "19:00 LABS: Разбор трудностей с Олей"];
+var _calEvents=[];
 // localStorage
 function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
 function todayStr(){return new Date().toLocaleDateString('ru-RU');}
