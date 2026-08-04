@@ -305,7 +305,7 @@ function openSkill(){document.getElementById('skillModal').classList.add('show')
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();saveState();praise()}
 renderAll();
 
-var _calEvents=["11:00 Свадьба родителей", "15:00 Выборы РП"];
+var _calEvents=["15:00 Встреча Правления и Совета", "18:00 Ащерков эфир про Алтай", "19:00 Встреча лидеров PRO Женщин | Барнаул"];
 // localStorage
 function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
 function todayStr(){return new Date().toLocaleDateString('ru-RU');}
