@@ -305,7 +305,7 @@ function openSkill(){document.getElementById('skillModal').classList.add('show')
 function addSkill(){let n=document.getElementById('skillName').value.trim();if(!n)return;state.skills.push([n,+document.getElementById('skillLearn').value||0,+document.getElementById('skillUse').value||0,+document.getElementById('skillEarn').value||0]);document.getElementById('skillName').value='';closeSkill();renderSkills();saveState();praise()}
 renderAll();
 
-var _calEvents=["20:00 ЛАБС 6: Разбор трудностей недели 1"];
+var _calEvents=["00:00 Тетя Лида", "ЛАБС 6: Финал недели 1 (дедлайн)", "10:30 Маша 2017 Ольги Сапроненко"];
 // localStorage
 function deleteItem(k,i){state.lists[k].splice(i,1);renderList(k);saveState();}
 function todayStr(){return new Date().toLocaleDateString('ru-RU');}
